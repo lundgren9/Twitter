@@ -9,6 +9,12 @@
    - Modal-fönster för teknisk dokumentation
    - Fade-animationer för bildväxling
    
+   UPPDATERING 2026-01-03:
+   - Lagt till styling för video-sektion
+   - Lagt till styling för input-ruta (med gul bakgrund)
+   - Lagt till styling för bildstatus-listor
+   - Uppdaterat responsiv design för nya element
+   
    ============================================ */
 
 /* === 1. GRUNDLÄGGANDE RESET OCH TYPOGRAFI === */
@@ -356,7 +362,252 @@ header h1 {
     }
 }
 
-/* === 8. RESPONSIV DESIGN (MOBIL) === */
+/* === 8. VIDEO-SEKTION ===
+   UPPDATERING 2026-01-03: Ny sektion för inbäddad Twitter-video */
+
+.video-section {
+    margin: 40px 0;
+    text-align: center;
+}
+
+.video-section h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.video-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+/* Gör Twitter-embed responsiv */
+.video-container .twitter-tweet {
+    margin: 0 auto !important;
+}
+
+.video-note {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: 15px;
+}
+
+.video-note a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.video-note a:hover {
+    text-decoration: underline;
+}
+
+/* === 9. INPUT-SEKTION FÖR ATT LÄGGA TILL BILDER ===
+   UPPDATERING 2026-01-03: Ny funktionalitet */
+
+.add-image-section {
+    margin: 40px 0;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border: 2px dashed #667eea;
+}
+
+.add-image-section h2 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.section-description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Input-fält med gul bakgrund enligt användarens önskemål */
+#imageUrlInput {
+    flex: 1;
+    padding: 12px 15px;
+    font-size: 1em;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    background-color: #fffde7; /* GUL BAKGRUND - tydligt inmatningsfält */
+    transition: all 0.3s ease;
+}
+
+#imageUrlInput:focus {
+    outline: none;
+    border-color: #764ba2;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+    background-color: #fff9c4; /* Ljusare gul vid fokus */
+}
+
+#imageUrlInput::placeholder {
+    color: #999;
+}
+
+.add-btn {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Meddelande efter input */
+.input-message {
+    text-align: center;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.input-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.input-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* === 10. BILDSTATUS-SEKTION ===
+   UPPDATERING 2026-01-03: Visar vilka bilder som visas och är i kö */
+
+.image-status-section {
+    margin: 40px 0;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.status-box {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #667eea;
+}
+
+.status-box h3 {
+    color: #333;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.status-box.current-images {
+    border-top-color: #28a745; /* Grön för aktiva bilder */
+}
+
+.status-box.stack-images {
+    border-top-color: #ffc107; /* Gul för väntande bilder */
+}
+
+.status-box.user-images {
+    border-top-color: #764ba2; /* Lila för användarbilder */
+}
+
+.image-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.image-list li {
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 0.85em;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.2s;
+}
+
+.image-list li:hover {
+    background: #e9ecef;
+}
+
+.position-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.75em;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.empty-message {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+}
+
+.user-image-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+/* === 11. RESPONSIV DESIGN (MOBIL) === */
 
 /* För tablets och mindre skärmar */
 @media (max-width: 768px) {
@@ -402,6 +653,32 @@ header h1 {
         font-size: 0.8em;
         padding: 10px;
     }
+    
+    /* UPPDATERING 2026-01-03: Responsiv design för nya sektioner */
+    
+    /* Status-grid blir vertikal på mobil */
+    .status-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* Input-container blir vertikal */
+    .input-container {
+        flex-direction: column;
+    }
+    
+    .add-btn {
+        width: 100%;
+    }
+    
+    /* Mindre sektionspadding */
+    .add-image-section {
+        padding: 20px;
+    }
+    
+    .video-section h2 {
+        font-size: 1.4em;
+    }
 }
 
 /* För mycket små mobilskärmar */
@@ -422,5 +699,23 @@ header h1 {
     /* Mindre gap mellan bilder */
     .image-grid {
         gap: 8px;
+    }
+    
+    /* UPPDATERING 2026-01-03: Anpassningar för små skärmar */
+    .status-box {
+        padding: 15px;
+    }
+    
+    .status-box h3 {
+        font-size: 1em;
+    }
+    
+    .image-list li {
+        font-size: 0.8em;
+        padding: 6px 8px;
+    }
+    
+    .add-image-section h2 {
+        font-size: 1.2em;
     }
 }

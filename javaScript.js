@@ -3,43 +3,41 @@
    ============================================
    
    Detta JavaScript-program hanterar:
-   1. Hårdkodade demonstrationsbilder
+   1. Bilder från Twitter/X med hashtag #Bjerredssaltsjobad
    2. Automatisk bildväxling var 4:e sekund
    3. Fade-in/fade-out animationer
    4. Modal-fönster för teknisk dokumentation
+   5. Input-ruta för att lägga till egna bilder
+   6. localStorage för att spara användarens bilder
+   7. Visning av aktuella bilder och "stack" (väntande bilder)
    
-   I framtiden (med X API Basic tier) skulle detta
-   kunna kopplas till live-data från Twitter/X.
+   UPPDATERING 2026-01-03:
+   - Ersatt Unsplash-bilder med riktiga Twitter-bilder
+   - Lagt till input-ruta för nya bilder
+   - Lagt till localStorage för att spara bilder
+   - Lagt till visning av bildstack
    
    ============================================ */
 
 // === 1. GLOBALA VARIABLER ===
 
-// Hårdkodad bildbank för demonstration
-// I en riktig implementation skulle dessa hämtas från X API
-// med sökning på hashtag #Bjerredssaltsjobad
-const imagePool = [
-    // Placeholder-bilder från Unsplash (relaterade till hav, bad, natur)
-    // Dessa representerar bilder som skulle komma från X API
-    'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&h=800&fit=crop', // Strand
-    'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=800&fit=crop', // Hav
-    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=800&fit=crop', // Strand
-    'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&h=800&fit=crop', // Hav
-    'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=800&fit=crop', // Sjö
-    'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=800&h=800&fit=crop', // Brygga
-    'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&h=800&fit=crop', // Hav
-    'https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800&h=800&fit=crop', // Natur
-    'https://images.unsplash.com/photo-1502933691298-84fc14542831?w=800&h=800&fit=crop', // Hav
-    'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&h=800&fit=crop', // Strand
-    'https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?w=800&h=800&fit=crop', // Vatten
-    'https://images.unsplash.com/photo-1484821582734-6c6c9f99a672?w=800&h=800&fit=crop', // Hav
-    'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&h=800&fit=crop', // Sjö
-    'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=800&fit=crop', // Strand
-    'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&h=800&fit=crop', // Vatten
-    'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=800&h=800&fit=crop', // Brygga
-    'https://images.unsplash.com/photo-1520443240718-fce21f665530?w=800&h=800&fit=crop', // Hav
-    'https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=800&h=800&fit=crop'  // Strand
+// UPPDATERING 2026-01-03: Riktiga bilder från Twitter/X med hashtag #Bjerredssaltsjobad
+// Dessa bilder kommer från @kentlundgren på X
+const defaultImages = [
+    'https://pbs.twimg.com/media/G6SRdvUW0AEJc6G?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G6SRdxlWsAAPoIi?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G6SeZh_X0AAVPdc?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G9gcau5WAAAs3nw?format=jpg&name=large',
+    'https://pbs.twimg.com/media/Gx1z6tOWEAEVhU2?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GziGQg-WUAAq9GH?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G0GQS82W0AA_uyb?format=jpg&name=large',
+    'https://pbs.twimg.com/media/Gmvpf-GW4AApxnI?format=jpg&name=large',
+    'https://pbs.twimg.com/media/Gqc3dWeXAAAwFqD?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GXISy3rWEAEc1-y?format=jpg&name=large'
 ];
+
+// Bildpool som innehåller alla bilder (standard + användarens egna)
+let imagePool = [];
 
 // Array som håller aktuella bilder som visas (9 stycken för 3x3 grid)
 let currentImages = [];
@@ -50,11 +48,56 @@ let imageIndex = 0;
 // Intervall-ID för bildväxlingen (används för att kunna stoppa interval)
 let imageRotationInterval;
 
-// === 2. INITIALISERING VID SIDLADDNING ===
+// === 2. LOCALSTORAGE HANTERING ===
+// UPPDATERING 2026-01-03: Ny funktionalitet för att spara bilder lokalt
+
+/**
+ * Laddar sparade bilder från localStorage
+ * @returns {Array} Array med sparade bild-URLs
+ */
+function loadSavedImages() {
+    try {
+        const saved = localStorage.getItem('bjerred_user_images');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            console.log(`Laddade ${parsed.length} sparade bilder från localStorage`);
+            return parsed;
+        }
+    } catch (error) {
+        console.error('Fel vid laddning från localStorage:', error);
+    }
+    return [];
+}
+
+/**
+ * Sparar användarens bilder till localStorage
+ * @param {Array} images - Array med bild-URLs att spara
+ */
+function saveUserImages(images) {
+    try {
+        localStorage.setItem('bjerred_user_images', JSON.stringify(images));
+        console.log(`Sparade ${images.length} bilder till localStorage`);
+    } catch (error) {
+        console.error('Fel vid sparning till localStorage:', error);
+    }
+}
+
+/**
+ * Hämtar endast användarens tillagda bilder (inte standardbilderna)
+ * @returns {Array} Array med användarens bild-URLs
+ */
+function getUserImages() {
+    return imagePool.filter(img => !defaultImages.includes(img));
+}
+
+// === 3. INITIALISERING VID SIDLADDNING ===
 
 // Väntar tills hela DOM:en är laddad innan JavaScript körs
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Bjerreds Saltsjöbad Collage initialiseras...');
+    
+    // UPPDATERING 2026-01-03: Ladda sparade bilder och kombinera med standardbilder
+    initializeImagePool();
     
     // Ladda de första 9 bilderna
     loadInitialImages();
@@ -65,10 +108,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sätt upp event listeners för modal-fönstret
     setupModal();
     
+    // UPPDATERING 2026-01-03: Sätt upp input-ruta för nya bilder
+    setupImageInput();
+    
+    // UPPDATERING 2026-01-03: Uppdatera bildlistorna
+    updateImageLists();
+    
+    // Ladda Twitter widget för video embed
+    loadTwitterWidget();
+    
     console.log('Initialisering klar!');
 });
 
-// === 3. BILDHANTERING ===
+/**
+ * UPPDATERING 2026-01-03: Initialiserar bildpoolen med standard + sparade bilder
+ */
+function initializeImagePool() {
+    // Börja med standardbilderna
+    imagePool = [...defaultImages];
+    
+    // Lägg till sparade användarbilder
+    const savedImages = loadSavedImages();
+    if (savedImages.length > 0) {
+        imagePool = [...imagePool, ...savedImages];
+        console.log(`Bildpool initialiserad med ${defaultImages.length} standardbilder + ${savedImages.length} sparade bilder`);
+    } else {
+        console.log(`Bildpool initialiserad med ${defaultImages.length} standardbilder`);
+    }
+}
+
+// === 4. BILDHANTERING ===
 
 /**
  * Laddar de första 9 bilderna vid sidstart
@@ -76,6 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function loadInitialImages() {
     console.log('Laddar initiala bilder...');
+    
+    // Töm currentImages
+    currentImages = [];
     
     // Loopa genom alla 9 bildplatser (img1 till img9)
     for (let i = 1; i <= 9; i++) {
@@ -104,6 +176,9 @@ function loadInitialImages() {
     }
     
     console.log('Initiala bilder laddade:', currentImages);
+    
+    // UPPDATERING 2026-01-03: Uppdatera bildlistorna
+    updateImageLists();
 }
 
 /**
@@ -174,10 +249,241 @@ function rotateRandomImage() {
             imgElement.removeEventListener('load', onLoad);
         });
         
+        // UPPDATERING 2026-01-03: Uppdatera bildlistorna efter byte
+        updateImageLists();
+        
     }, 800); // 800ms matchar transition-tiden i CSS
 }
 
-// === 4. MODAL-HANTERING ===
+// === 5. INPUT-RUTA FÖR NYA BILDER ===
+// UPPDATERING 2026-01-03: Ny funktionalitet
+
+/**
+ * Sätter upp event listeners för input-rutan där användare kan lägga till bilder
+ */
+function setupImageInput() {
+    const addButton = document.getElementById('addImageBtn');
+    const imageInput = document.getElementById('imageUrlInput');
+    
+    if (!addButton || !imageInput) {
+        console.warn('Input-element för bilder hittades inte');
+        return;
+    }
+    
+    // Lägg till bild när knappen klickas
+    addButton.addEventListener('click', function() {
+        addNewImage();
+    });
+    
+    // Lägg till bild när Enter trycks i input-fältet
+    imageInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            addNewImage();
+        }
+    });
+    
+    console.log('Input-ruta för bilder uppsatt');
+}
+
+/**
+ * Lägger till en ny bild från input-fältet till bildpoolen
+ */
+function addNewImage() {
+    const imageInput = document.getElementById('imageUrlInput');
+    const url = imageInput.value.trim();
+    
+    // Validera URL
+    if (!url) {
+        showMessage('Ange en bild-URL', 'error');
+        return;
+    }
+    
+    // Enkel URL-validering
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        showMessage('URL måste börja med http:// eller https://', 'error');
+        return;
+    }
+    
+    // Kontrollera om bilden redan finns
+    if (imagePool.includes(url)) {
+        showMessage('Denna bild finns redan i poolen', 'error');
+        return;
+    }
+    
+    // Lägg till bilden i poolen
+    imagePool.push(url);
+    console.log(`Ny bild tillagd: ${url}`);
+    
+    // Spara användarbilder till localStorage
+    saveUserImages(getUserImages());
+    
+    // Töm input-fältet
+    imageInput.value = '';
+    
+    // Visa bekräftelse
+    showMessage('Bild tillagd!', 'success');
+    
+    // Uppdatera listorna
+    updateImageLists();
+}
+
+/**
+ * Visar ett meddelande för användaren
+ * @param {string} message - Meddelandet att visa
+ * @param {string} type - 'success' eller 'error'
+ */
+function showMessage(message, type) {
+    const messageEl = document.getElementById('inputMessage');
+    if (messageEl) {
+        messageEl.textContent = message;
+        messageEl.className = `input-message ${type}`;
+        messageEl.style.display = 'block';
+        
+        // Dölj meddelandet efter 3 sekunder
+        setTimeout(() => {
+            messageEl.style.display = 'none';
+        }, 3000);
+    }
+}
+
+/**
+ * Tar bort en användartillagd bild från poolen
+ * @param {string} url - URL:en till bilden som ska tas bort
+ */
+function removeUserImage(url) {
+    // Ta bort från imagePool
+    const index = imagePool.indexOf(url);
+    if (index > -1) {
+        imagePool.splice(index, 1);
+        console.log(`Bild borttagen: ${url}`);
+        
+        // Spara uppdaterad lista
+        saveUserImages(getUserImages());
+        
+        // Uppdatera listorna
+        updateImageLists();
+        
+        showMessage('Bild borttagen', 'success');
+    }
+}
+
+// Gör removeUserImage tillgänglig globalt för onclick
+window.removeUserImage = removeUserImage;
+
+// === 6. BILDLISTOR (VISADE + STACK) ===
+// UPPDATERING 2026-01-03: Ny funktionalitet
+
+/**
+ * Uppdaterar listorna som visar vilka bilder som visas och vilka som väntar
+ */
+function updateImageLists() {
+    updateCurrentImagesList();
+    updateStackList();
+    updateUserImagesList();
+}
+
+/**
+ * Uppdaterar listan över de 9 bilder som visas just nu
+ */
+function updateCurrentImagesList() {
+    const listEl = document.getElementById('currentImagesList');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+    
+    currentImages.forEach((url, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="position-badge">${index + 1}</span> ${getImageName(url)}`;
+        li.title = url; // Visa full URL vid hover
+        listEl.appendChild(li);
+    });
+}
+
+/**
+ * Uppdaterar listan över bilder som väntar i stacken
+ */
+function updateStackList() {
+    const listEl = document.getElementById('stackList');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+    
+    // Beräkna vilka bilder som är i stacken (inte visas just nu)
+    const stackImages = imagePool.filter(img => !currentImages.includes(img));
+    
+    if (stackImages.length === 0) {
+        listEl.innerHTML = '<li class="empty-message">Alla bilder visas just nu</li>';
+        return;
+    }
+    
+    stackImages.forEach((url, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = getImageName(url);
+        li.title = url;
+        listEl.appendChild(li);
+    });
+}
+
+/**
+ * Uppdaterar listan över användarens egna tillagda bilder
+ */
+function updateUserImagesList() {
+    const listEl = document.getElementById('userImagesList');
+    if (!listEl) return;
+    
+    const userImages = getUserImages();
+    listEl.innerHTML = '';
+    
+    if (userImages.length === 0) {
+        listEl.innerHTML = '<li class="empty-message">Inga egna bilder tillagda</li>';
+        return;
+    }
+    
+    userImages.forEach((url) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span class="user-image-name">${getImageName(url)}</span>
+            <button class="remove-btn" onclick="removeUserImage('${url}')" title="Ta bort">×</button>
+        `;
+        li.title = url;
+        listEl.appendChild(li);
+    });
+}
+
+/**
+ * Extraherar ett kortare namn från en bild-URL
+ * @param {string} url - Bild-URL
+ * @returns {string} Förkortat namn
+ */
+function getImageName(url) {
+    try {
+        // För Twitter-bilder, extrahera media-ID
+        if (url.includes('pbs.twimg.com')) {
+            const match = url.match(/media\/([A-Za-z0-9_-]+)/);
+            if (match) {
+                return `Twitter: ${match[1].substring(0, 12)}...`;
+            }
+        }
+        
+        // För andra bilder, ta sista delen av URL:en
+        const parts = url.split('/');
+        let name = parts[parts.length - 1];
+        
+        // Ta bort query parameters
+        name = name.split('?')[0];
+        
+        // Förkorta om för långt
+        if (name.length > 25) {
+            name = name.substring(0, 22) + '...';
+        }
+        
+        return name;
+    } catch (e) {
+        return 'Okänd bild';
+    }
+}
+
+// === 7. MODAL-HANTERING ===
 
 /**
  * Sätter upp event listeners för modal-fönstret
@@ -232,120 +538,37 @@ function closeModal() {
     document.body.style.overflow = 'auto'; // Återställ scrolling
 }
 
-// === 5. FRAMTIDA X API INTEGRATION (KOMMENTERAD KOD) ===
-
-/*
- * Följande kod visar HUR X/Twitter API skulle integreras
- * när du uppgraderat till Basic tier ($100/månad).
- * 
- * Denna kod fungerar INTE med Free tier!
- */
+// === 8. TWITTER WIDGET FÖR VIDEO ===
+// UPPDATERING 2026-01-03: Ny funktionalitet för inbäddad video
 
 /**
- * EXEMPEL: Hämta tweets med bilder från X API
- * Kräver Basic tier och backend-server på kentlundgren.se
- * 
- * @returns {Promise<Array>} Array med bild-URLs från tweets
+ * Laddar Twitter widget.js för att rendera inbäddade tweets/videos
  */
-/*
-async function fetchImagesFromXAPI() {
-    console.log('Försöker hämta bilder från X API...');
-    
-    try {
-        // Anropa din backend-proxy (måste skapas på kentlundgren.se)
-        // Proxyn gör det riktiga API-anropet till X med din Bearer Token
-        const response = await fetch('https://www.kentlundgren.se/twitter-proxy.php');
-        
-        // Om anropet misslyckades, kasta fel
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // Parsa JSON-svaret från API
-        const data = await response.json();
-        
-        console.log('API-svar mottaget:', data);
-        
-        // Extrahera bilder från API-svaret
-        // X API returnerar media i "includes.media" arrayen
-        const images = [];
-        
-        // Kontrollera om data innehåller media
-        if (data.includes && data.includes.media) {
-            // Loopa genom alla media-objekt
-            data.includes.media.forEach(media => {
-                // Vi vill bara ha foton (inte videos)
-                if (media.type === 'photo') {
-                    // Lägg till bildens URL i vår array
-                    images.push(media.url);
-                }
-            });
-        }
-        
-        console.log(`${images.length} bilder hämtade från X API`);
-        return images;
-        
-    } catch (error) {
-        console.error('Fel vid hämtning från X API:', error);
-        
-        // Om API-anropet misslyckas, använd hårdkodade bilder som backup
-        console.log('Använder hårdkodade backup-bilder istället');
-        return imagePool;
+function loadTwitterWidget() {
+    // Kontrollera om scriptet redan är laddat
+    if (window.twttr) {
+        console.log('Twitter widget redan laddat');
+        return;
     }
-}
-*/
-
-/**
- * EXEMPEL: Initiera med live-data från X API
- * Denna funktion skulle ersätta loadInitialImages() när API är aktivt
- */
-/*
-async function loadImagesFromAPI() {
-    console.log('Laddar bilder från X API...');
     
-    // Visa laddningsindikator
-    showLoadingIndicator();
+    // Skapa och lägg till Twitter widget script
+    const script = document.createElement('script');
+    script.src = 'https://platform.twitter.com/widgets.js';
+    script.async = true;
+    script.charset = 'utf-8';
     
-    try {
-        // Hämta bilder från API
-        const apiImages = await fetchImagesFromXAPI();
-        
-        // Om vi fick bilder från API, använd dem
-        if (apiImages && apiImages.length > 0) {
-            // Ersätt imagePool med API-bilder
-            imagePool.length = 0; // Töm befintlig pool
-            imagePool.push(...apiImages); // Lägg till API-bilder
-            
-            // Ladda de första 9 bilderna
-            loadInitialImages();
-        } else {
-            // Ingen data från API - använd hårdkodade bilder
-            console.warn('Inga bilder från API - använder hårdkodade bilder');
-            loadInitialImages();
+    script.onload = function() {
+        console.log('Twitter widget laddat');
+        // Rendera alla Twitter embeds
+        if (window.twttr && window.twttr.widgets) {
+            window.twttr.widgets.load();
         }
-        
-    } catch (error) {
-        console.error('Fel vid API-laddning:', error);
-        // Vid fel, använd hårdkodade bilder
-        loadInitialImages();
-    } finally {
-        // Dölj laddningsindikator oavsett om det lyckades eller inte
-        hideLoadingIndicator();
-    }
+    };
+    
+    document.body.appendChild(script);
 }
 
-function showLoadingIndicator() {
-    // Implementera en spinner eller "Laddar..."-text
-    console.log('Visar laddningsindikator...');
-}
-
-function hideLoadingIndicator() {
-    // Dölj spinner/laddningstext
-    console.log('Döljer laddningsindikator...');
-}
-*/
-
-// === 6. DEBUG & HJÄLPFUNKTIONER ===
+// === 9. DEBUG & HJÄLPFUNKTIONER ===
 
 /**
  * Stoppar bildväxlingen (användbar för debugging)
@@ -363,15 +586,33 @@ function stopImageRotation() {
 function debugStatus() {
     console.log('=== DEBUG STATUS ===');
     console.log('Antal bilder i pool:', imagePool.length);
+    console.log('Standardbilder:', defaultImages.length);
+    console.log('Användarbilder:', getUserImages().length);
     console.log('Aktuellt bildindex:', imageIndex);
     console.log('Visade bilder:', currentImages);
+    console.log('I stacken:', imagePool.filter(img => !currentImages.includes(img)).length);
     console.log('Rotation aktiv:', imageRotationInterval !== undefined);
     console.log('===================');
+}
+
+/**
+ * Rensar alla användarbilder från localStorage
+ */
+function clearUserImages() {
+    localStorage.removeItem('bjerred_user_images');
+    imagePool = [...defaultImages];
+    imageIndex = 0;
+    loadInitialImages();
+    updateImageLists();
+    showMessage('Alla användarbilder borttagna', 'success');
+    console.log('Användarbilder rensade');
 }
 
 // Gör debug-funktioner tillgängliga globalt för användning i konsolen
 window.stopImageRotation = stopImageRotation;
 window.debugStatus = debugStatus;
+window.clearUserImages = clearUserImages;
 
 console.log('💡 Tip: Skriv debugStatus() i konsolen för att se aktuell status');
 console.log('💡 Tip: Skriv stopImageRotation() i konsolen för att stoppa bildväxlingen');
+console.log('💡 Tip: Skriv clearUserImages() i konsolen för att rensa alla egna bilder');
