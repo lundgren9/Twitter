@@ -1,0 +1,426 @@
+/* ============================================
+   BJERREDS SALTSJÖBAD - BILDCOLLAGE CSS
+   ============================================
+   
+   Denna CSS-fil innehåller all styling för bildcollaget.
+   Huvudfokus är på:
+   - Responsiv design (fungerar på desktop och mobil)
+   - CSS Grid för bildrutnät
+   - Modal-fönster för teknisk dokumentation
+   - Fade-animationer för bildväxling
+   
+   ============================================ */
+
+/* === 1. GRUNDLÄGGANDE RESET OCH TYPOGRAFI === */
+
+/* Återställer standardmarginaler och padding för alla element */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Gör att padding och border inkluderas i elementets bredd */
+}
+
+/* Grundläggande body-styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient bakgrund */
+    min-height: 100vh; /* Minst hela viewporten i höjd */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+}
+
+/* === 2. HUVUDCONTAINER === */
+
+/* Container som håller allt innehåll */
+.container {
+    background: white;
+    border-radius: 20px; /* Rundade hörn */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); /* Skugga för djup */
+    padding: 40px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+/* === 3. SIDHUVUD (HEADER) === */
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Huvudrubrik */
+header h1 {
+    font-size: 2.5em;
+    color: #667eea;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+/* Underrubrik med hashtag */
+.subtitle {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+/* Källinformation med länk till X-konto */
+.source {
+    font-size: 0.9em;
+    color: #888;
+}
+
+.source a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.source a:hover {
+    text-decoration: underline;
+}
+
+/* === 4. BILDRUTNÄT (IMAGE GRID) === */
+
+/* CSS Grid för 3x3 rutnät av bilder */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Tre lika breda kolumner */
+    grid-template-rows: repeat(3, 1fr); /* Tre lika höga rader */
+    gap: 15px; /* Mellanrum mellan bilderna */
+    margin-bottom: 30px;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Kvadratiskt rutnät */
+}
+
+/* Varje bildslot (container för en bild) */
+.image-slot {
+    background: #f0f0f0; /* Ljusgrå bakgrund när bild laddar */
+    border-radius: 10px;
+    overflow: hidden; /* Klipper av bilder som är för stora */
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease; /* Mjuk övergång vid hover */
+}
+
+/* Hover-effekt: Bilden zoomar lite när man hovrar */
+.image-slot:hover {
+    transform: scale(1.05); /* Förstora med 5% */
+}
+
+/* Bilderna själva */
+.image-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Beskär bilden för att fylla hela slot:en */
+    display: block;
+    opacity: 0; /* Börjar osynlig för fade-in effekt */
+    transition: opacity 0.8s ease-in-out; /* Mjuk fade-transition */
+}
+
+/* Klass som läggs till när bild är laddad - gör bilden synlig */
+.image-slot img.loaded {
+    opacity: 1;
+}
+
+/* === 5. TEKNISK DOKUMENTATIONS-KNAPP === */
+
+/* Container för knappen */
+.tech-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Själva knappen */
+.tech-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 50px; /* Rundad "pill-shape" knapp */
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Ikon i knappen */
+.tech-icon {
+    font-size: 1.3em;
+}
+
+/* Hover-effekt på knappen */
+.tech-button:hover {
+    transform: translateY(-2px); /* Lyfter knappen lite */
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+/* Active-state (när man klickar) */
+.tech-button:active {
+    transform: translateY(0);
+}
+
+/* === 6. MODAL-FÖNSTER === */
+
+/* Bakgrund för modal (täcker hela skärmen) */
+.modal {
+    display: none; /* Dolt som standard */
+    position: fixed;
+    z-index: 1000; /* Ligger över allt annat */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Scrollbar om innehållet är för långt */
+    background-color: rgba(0, 0, 0, 0.6); /* Halvtransparent svart bakgrund */
+    animation: fadeIn 0.3s ease-in-out; /* Fade-in animation när modal öppnas */
+}
+
+/* Själva modal-innehållet (den vita boxen) */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* Centrerad vertikalt och horisontellt */
+    padding: 40px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 85vh; /* Max 85% av viewporthöjden */
+    overflow-y: auto; /* Scrollbar om innehållet är för långt */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.4s ease-out; /* Slide-down animation */
+}
+
+/* Stäng-knapp (X) */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+}
+
+/* Modal-rubriker */
+.modal-content h2 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 2em;
+}
+
+.modal-content h3 {
+    color: #764ba2;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    font-size: 1.5em;
+}
+
+.modal-content h4 {
+    color: #555;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+/* Modal-text */
+.modal-intro {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.modal-content p {
+    line-height: 1.8;
+    margin-bottom: 12px;
+    color: #444;
+}
+
+/* Listor i modalen */
+.modal-content ul,
+.modal-content ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+.modal-content ul li,
+.modal-content ol li {
+    margin-bottom: 8px;
+    color: #444;
+}
+
+/* Info-boxar för API-tiers */
+.info-box {
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+}
+
+.info-box p {
+    margin-bottom: 8px;
+}
+
+/* Varnings-text */
+.warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    color: #856404;
+}
+
+/* Kodblock (för exempel på kod) */
+.modal-content pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto; /* Horisontell scroll om koden är för bred */
+    margin: 15px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.modal-content code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+/* Länkar i modalen */
+.modal-content a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.modal-content a:hover {
+    text-decoration: underline;
+}
+
+/* Referenser-lista */
+.references {
+    list-style-type: none;
+    margin-left: 0;
+}
+
+.references li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.references li:before {
+    content: "📚";
+    position: absolute;
+    left: 0;
+}
+
+/* === 7. ANIMATIONER === */
+
+/* Fade-in animation för modal-bakgrund */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide-down animation för modal-innehåll */
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* === 8. RESPONSIV DESIGN (MOBIL) === */
+
+/* För tablets och mindre skärmar */
+@media (max-width: 768px) {
+    /* Mindre padding i container */
+    .container {
+        padding: 25px;
+    }
+    
+    /* Mindre rubrik */
+    header h1 {
+        font-size: 2em;
+    }
+    
+    /* 2x2 grid istället för 3x3 på mindre skärmar */
+    .image-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    /* Döljer de sista 5 bilderna på mobil (visar bara 4) */
+    .image-grid .image-slot:nth-child(n+5) {
+        display: none;
+    }
+    
+    /* Modal-innehåll anpassat för mobil */
+    .modal-content {
+        padding: 25px;
+        margin: 10% auto;
+        width: 95%;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.6em;
+    }
+    
+    .modal-content h3 {
+        font-size: 1.3em;
+    }
+    
+    /* Mindre kodblock på mobil */
+    .modal-content pre {
+        font-size: 0.8em;
+        padding: 10px;
+    }
+}
+
+/* För mycket små mobilskärmar */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.6em;
+    }
+    
+    .subtitle {
+        font-size: 1em;
+    }
+    
+    .tech-button {
+        padding: 12px 20px;
+        font-size: 0.95em;
+    }
+    
+    /* Mindre gap mellan bilder */
+    .image-grid {
+        gap: 8px;
+    }
+}
