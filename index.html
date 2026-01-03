@@ -232,8 +232,50 @@ function loadSavedImages() {
             <h4>4.3 "Dina tillagda bilder"</h4>
             <p>Visar bilder som användaren själv lagt till via input-rutan. Dessa kan tas bort genom att klicka på × bredvid bilden.</p>
 
+            <!-- UPPDATERING 2026-01-03: Ny sektion om lightbox och bildmetadata -->
+            <h3>5. Lightbox och bildmetadata</h3>
+            <p>Klicka på en bild i collaget för att se den i full storlek i en lightbox.</p>
+
+            <h4>5.1 Lightbox-funktioner:</h4>
+            <ul>
+                <li><strong>Visa hela bilden:</strong> Bilden visas i full storlek utan beskärning</li>
+                <li><strong>"Öppna på X":</strong> Länk till originaltweeten (om känd) eller @kentlundgren</li>
+                <li><strong>Stäng:</strong> Klicka på × eller tryck Escape</li>
+            </ul>
+
+            <h4>5.2 Varför är det svårt att visa datum och tweet-text?</h4>
+            <div class="warning">
+                <p><strong>⚠️ Problemet med Twitter/X-bilddata:</strong></p>
+                <p>När vi har en bild-URL från Twitter (t.ex. <code>pbs.twimg.com/media/ABC123</code>) finns det <strong>ingen koppling tillbaka</strong> till den ursprungliga tweeten.</p>
+            </div>
+
+            <div class="info-box">
+                <p><strong>Varför är detta svårt?</strong></p>
+                <ul>
+                    <li>❌ Bild-URL:er innehåller INTE tweet-ID</li>
+                    <li>❌ Twitter API:s Free tier tillåter INTE omvänd sökning (bild → tweet)</li>
+                    <li>❌ Ingen publik tjänst kan koppla bild-URL till tweet</li>
+                    <li>✅ Enda lösningen: Manuellt spara tweet-URL när bilden hämtas</li>
+                </ul>
+            </div>
+
+            <h4>5.3 Hur vi löst det:</h4>
+            <ol>
+                <li>Vi lagrar <strong>manuellt</strong> kända tweet-URLs i koden (objektet <code>imageMetadata</code>)</li>
+                <li>Om tweet-URL finns → visa "Öppna på X" som går till tweeten</li>
+                <li>Om tweet-URL saknas → visa länk till @kentlundgren på X</li>
+            </ol>
+
+            <h4>5.4 Framtida lösning:</h4>
+            <p>Med X API Basic tier (~$100/månad) skulle man kunna:</p>
+            <ul>
+                <li>Hämta tweets med bilder automatiskt</li>
+                <li>Spara tweet-ID, datum och text tillsammans med varje bild</li>
+                <li>Visa fullständig information i lightboxen</li>
+            </ul>
+
             <!-- X/Twitter API information -->
-            <h3>5. X/Twitter API - Framtida möjligheter</h3>
+            <h3>6. X/Twitter API - Framtida möjligheter</h3>
             
             <h4>5.1 API-åtkomstnivåer:</h4>
             <div class="info-box">
@@ -263,17 +305,18 @@ function loadSavedImages() {
             <p>X/Twitter API tillåter <strong>inte</strong> direkta anrop från webbläsaren. En backend-server (t.ex. PHP på kentlundgren.se) skulle behövas som proxy.</p>
 
             <!-- Framtida förbättringar -->
-            <h3>6. Framtida Förbättringar</h3>
+            <h3>7. Framtida Förbättringar</h3>
             <ul>
                 <li>Automatisk hämtning av bilder via X API (kräver Basic tier)</li>
                 <li>Drag-and-drop för att ladda upp lokala bilder</li>
                 <li>Möjlighet att ändra rotationshastigheten</li>
                 <li>Fullskärmsläge för bildcollaget</li>
                 <li>Dela-funktioner för sociala medier</li>
+                <li>Visa datum och tweet-text för alla bilder (kräver manuell datainsamling eller API)</li>
             </ul>
 
             <!-- Referenser -->
-            <h3>7. Referenser</h3>
+            <h3>8. Referenser</h3>
             <ul class="references">
                 <li>X Developer Portal (2025) <em>X API Documentation</em>. Tillgänglig: <a href="https://developer.x.com/en/docs/twitter-api" target="_blank">https://developer.x.com/en/docs/twitter-api</a></li>
                 <li>X Developer Portal (2025) <em>Embedded Tweets</em>. Tillgänglig: <a href="https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets/overview" target="_blank">https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets</a></li>
@@ -281,6 +324,22 @@ function loadSavedImages() {
                 <li>MDN Web Docs (2025) <em>CORS - Cross-Origin Resource Sharing</em>. Tillgänglig: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS</a></li>
             </ul>
 
+        </div>
+    </div>
+
+    <!-- UPPDATERING 2026-01-03: Lightbox för att visa bilder i full storlek -->
+    <!-- Klicka på en bild i collaget för att öppna lightbox -->
+    <div id="imageLightbox" class="lightbox" style="display: none;">
+        <div class="lightbox-overlay"></div>
+        <div class="lightbox-content">
+            <button id="closeLightbox" class="lightbox-close" title="Stäng">×</button>
+            <img id="lightboxImage" src="" alt="Fullstor bild">
+            <div class="lightbox-actions">
+                <a id="openOnXBtn" href="#" target="_blank" rel="noopener noreferrer" class="lightbox-btn">
+                    🐦 Öppna på X
+                </a>
+            </div>
+            <div id="lightboxImageInfo" class="lightbox-info" style="display: none;"></div>
         </div>
     </div>
 

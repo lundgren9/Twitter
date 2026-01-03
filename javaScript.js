@@ -36,6 +36,18 @@ const defaultImages = [
     'https://pbs.twimg.com/media/GXISy3rWEAEc1-y?format=jpg&name=large'
 ];
 
+// UPPDATERING 2026-01-03: Metadata för bilder där vi känner till tweet-URL
+// Nyckel = bild-ID (från URL), Värde = { tweetUrl, date, text }
+// OBS: Det är svårt att få fram denna data för alla bilder, se Teknisk Dokumentation
+const imageMetadata = {
+    'GziGQg-WUAAq9GH': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1961465270280577380',
+        date: null,  // Okänt datum
+        text: null   // Okänd text
+    }
+    // Lägg till fler bilder här om du får tag på deras tweet-URLs
+};
+
 // Bildpool som innehåller alla bilder (standard + användarens egna)
 let imagePool = [];
 
@@ -113,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // UPPDATERING 2026-01-03: Uppdatera bildlistorna
     updateImageLists();
+    
+    // UPPDATERING 2026-01-03: Sätt upp lightbox för bildvisning
+    setupLightbox();
     
     // Ladda Twitter widget för video embed
     loadTwitterWidget();
@@ -538,7 +553,150 @@ function closeModal() {
     document.body.style.overflow = 'auto'; // Återställ scrolling
 }
 
-// === 8. TWITTER WIDGET FÖR VIDEO ===
+// === 8. LIGHTBOX FÖR BILDVISNING ===
+// UPPDATERING 2026-01-03: Ny funktionalitet för att visa bilder i fullstorlek
+
+/**
+ * Sätter upp lightbox-funktionalitet för bilderna
+ * Gör så att man kan klicka på en bild för att se den i full storlek
+ */
+function setupLightbox() {
+    console.log('Sätter upp lightbox...');
+    
+    // Hämta alla bildslots
+    const imageSlots = document.querySelectorAll('.image-slot');
+    
+    // Lägg till klick-händelse på varje bildslot
+    imageSlots.forEach((slot) => {
+        slot.style.cursor = 'pointer'; // Visa att bilden är klickbar
+        slot.addEventListener('click', function() {
+            const img = this.querySelector('img');
+            if (img && img.src) {
+                openLightbox(img.src);
+            }
+        });
+    });
+    
+    // Sätt upp stängning av lightbox
+    const lightbox = document.getElementById('imageLightbox');
+    const closeBtn = document.getElementById('closeLightbox');
+    
+    if (lightbox && closeBtn) {
+        // Stäng vid klick på X
+        closeBtn.addEventListener('click', closeLightbox);
+        
+        // Stäng vid klick utanför bilden
+        lightbox.addEventListener('click', function(event) {
+            if (event.target === lightbox || event.target.classList.contains('lightbox-overlay')) {
+                closeLightbox();
+            }
+        });
+        
+        // Stäng med Escape-tangenten
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && lightbox.style.display === 'flex') {
+                closeLightbox();
+            }
+        });
+    }
+    
+    console.log('Lightbox setup klar!');
+}
+
+/**
+ * Öppnar lightbox med angiven bild
+ * @param {string} imageUrl - URL till bilden som ska visas
+ */
+function openLightbox(imageUrl) {
+    console.log('Öppnar lightbox för:', imageUrl);
+    
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const openOnXBtn = document.getElementById('openOnXBtn');
+    const imageInfo = document.getElementById('lightboxImageInfo');
+    
+    if (!lightbox || !lightboxImg) {
+        console.error('Lightbox-element hittades inte');
+        return;
+    }
+    
+    // Sätt bilden
+    lightboxImg.src = imageUrl;
+    
+    // Hämta metadata för bilden om den finns
+    const imageId = extractImageId(imageUrl);
+    const metadata = imageMetadata[imageId];
+    
+    // Uppdatera "Öppna på X"-knappen
+    if (openOnXBtn) {
+        if (metadata && metadata.tweetUrl) {
+            // Vi har en känd tweet-URL
+            openOnXBtn.href = metadata.tweetUrl;
+            openOnXBtn.title = 'Öppna originaltweeten på X';
+        } else {
+            // Ingen känd tweet-URL - länka till sökning på @kentlundgren
+            openOnXBtn.href = 'https://x.com/kentlundgren';
+            openOnXBtn.title = 'Besök @kentlundgren på X (tweet-URL okänd)';
+        }
+    }
+    
+    // Visa bildinfo om det finns
+    if (imageInfo) {
+        if (metadata) {
+            let infoHtml = '<p><strong>Bildinfo:</strong></p>';
+            if (metadata.date) {
+                infoHtml += `<p>📅 Datum: ${metadata.date}</p>`;
+            }
+            if (metadata.text) {
+                infoHtml += `<p>💬 "${metadata.text}"</p>`;
+            }
+            if (!metadata.date && !metadata.text) {
+                infoHtml += '<p class="info-note">ℹ️ Datum och text är okänt för denna bild.<br>Klicka "Öppna på X" för att se originaltweeten.</p>';
+            }
+            imageInfo.innerHTML = infoHtml;
+            imageInfo.style.display = 'block';
+        } else {
+            imageInfo.innerHTML = '<p class="info-note">ℹ️ Ingen metadata tillgänglig för denna bild.<br>Besök @kentlundgren på X för att hitta originaltweeten.</p>';
+            imageInfo.style.display = 'block';
+        }
+    }
+    
+    // Visa lightbox
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Stänger lightbox
+ */
+function closeLightbox() {
+    const lightbox = document.getElementById('imageLightbox');
+    if (lightbox) {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/**
+ * Extraherar bild-ID från en Twitter bild-URL
+ * @param {string} url - Bild-URL
+ * @returns {string|null} Bild-ID eller null
+ */
+function extractImageId(url) {
+    if (url && url.includes('pbs.twimg.com')) {
+        const match = url.match(/media\/([A-Za-z0-9_-]+)/);
+        if (match) {
+            return match[1];
+        }
+    }
+    return null;
+}
+
+// Gör lightbox-funktioner tillgängliga globalt
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+
+// === 9. TWITTER WIDGET FÖR VIDEO ===
 // UPPDATERING 2026-01-03: Ny funktionalitet för inbäddad video
 
 /**
@@ -568,7 +726,7 @@ function loadTwitterWidget() {
     document.body.appendChild(script);
 }
 
-// === 9. DEBUG & HJÄLPFUNKTIONER ===
+// === 10. DEBUG & HJÄLPFUNKTIONER ===
 
 /**
  * Stoppar bildväxlingen (användbar för debugging)
