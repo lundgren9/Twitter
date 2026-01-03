@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bjerreds saltsjöbad — startsida</title>
+  <style>
+    body{font-family:Inter,system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:0; background:#fafbfd; color:#111}
+    .container{max-width:900px;margin:48px auto;padding:24px}
+    .btn{display:inline-block;padding:10px 14px;background:#0b69ff;color:#fff;border-radius:8px;text-decoration:none}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center}
+    .modal{background:#fff;padding:18px;border-radius:10px;max-width:760px;width:94%;box-shadow:0 8px 30px rgba(0,0,0,0.12)}
+    .close{float:right;background:#eee;border-radius:6px;padding:6px 8px;cursor:pointer}
+    pre{background:#f6f8fa;padding:12px;border-radius:6px;overflow:auto}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bjerreds saltsjöbad — projekt</h1>
+    <p>Detta repo innehåller en automatisk collage-generator som söker efter bilder taggade med <strong>#Bjerredsaltsjobad</strong> på X (Twitter) och uppdaterar ett 3×3-collage i collage.html.</p>
+    <p><a class="btn" id="techBtn">Teknik — hur det fungerar</a></p>
+
+    <h2>Visning</h2>
+    <p>Öppna <a href="./collage.html">collage.html</a> för att se collage. Sidan läser images.json som uppdateras av en GitHub Action varje timme.</p>
+
+    <div style="margin-top:32px">
+      <strong>Mitt X-konto:</strong> <a href="https://x.com/kentlundgren" target="_blank" rel="noopener noreferrer">https://x.com/kentlundgren</a>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="techTitle">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h3 id="techTitle">Teknik — hur det fungerar</h3>
+        <button class="close" id="closeBtn">Stäng</button>
+      </div>
+      <div style="margin-top:8px;line-height:1.45">
+        <p>Översikt:</p>
+        <ul>
+          <li>En GitHub Action körs automatiskt varje timme och kör ett Node.js-skript som söker X/Twitter efter tweets taggade med <code>#Bjerredsaltsjobad</code>, hämtar upp till flera bilder och skriver en <code>images.json</code> fil i repot.</li>
+          <li><code>collage.html</code> läser <code>images.json</code> och visar ett 3×3-collage. Klientsidan växlar sida med bilder var 3:e sekund.</li>
+        </ul>
+
+        <p>Hämta en X (Twitter) Bearer-token:</p>
+        <ol>
+          <li>Gå till X developer portal: <a href="https://developer.twitter.com/" target="_blank" rel="noopener noreferrer">https://developer.twitter.com/</a> eller <a href="https://developer.x.com/" target="_blank" rel="noopener noreferrer">https://developer.x.com/</a>.</li>
+          <li>Skapa ett developer-konto om du inte redan har ett och skapa ett Project & App.</li>
+          <li>I appinställningarna gå till "Keys and tokens" eller "Authentication" och generera en OAuth 2.0 Bearer Token. Kopiera token.</li>
+          <li>I GitHub: gå till repo → Settings → Secrets and variables → Actions → New repository secret. Namn: <code>X_BEARER_TOKEN</code>. Klistra in token och spara.</li>
+        </ol>
+
+        <p>Hur Actionen använder API:et:</p>
+        <pre>GET https://api.twitter.com/2/tweets/search/recent?query=%23Bjerredsaltsjobad&expansions=attachments.media_keys,author_id&media.fields=url,preview_image_url,type,width,height,alt_text&tweet.fields=text,created_at&user.fields=username</pre>
+
+        <p>Säkerhet & begränsningar:</p>
+        <ul>
+          <li>Din Bearer-token lagras som en GitHub Secret och exponeras inte i commits eller loggar.</li>
+          <li>X/Twitter kan ha rate limits eller krav på API-åtkomstnivå som påverkar sökningen.</li>
+          <li>Bilder visas via externa URL:er — kontrollera upphovsrätt innan vidare publicering.</li>
+        </ul>
+
+        <p>Köra lokalt:</p>
+        <ol>
+          <li>Installera Node.js (>=16 rekommenderas).</li>
+          <li>Exportera token i terminalen: <code>export X_BEARER_TOKEN=&lt;din_token&gt;</code> (Windows: <code>set</code>).</li>
+          <li>Kör skriptet: <code>node scripts/fetch_images.js</code>. Skriptet skapar/uppdaterar images.json.</li>
+        </ol>
+
+        <p>Behöver du hjälp att skapa developer-konto eller lägga in secret i GitHub? Säg till så guidar jag dig steg för steg.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('modal');
+    document.getElementById('techBtn').addEventListener('click', ()=> modal.style.display='flex');
+    document.getElementById('closeBtn').addEventListener('click', ()=> modal.style.display='none');
+    modal.addEventListener('click', (e)=>{ if (e.target === modal) modal.style.display='none' });
+  </script>
+</body>
+</html>
