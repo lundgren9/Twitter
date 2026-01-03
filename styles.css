@@ -133,10 +133,15 @@ header h1 {
 
 /* === 5. TEKNISK DOKUMENTATIONS-KNAPP === */
 
-/* Container för knappen */
+/* Container för knapparna */
+/* UPPDATERING 2026-01-03: Uppdaterad för att visa flera knappar */
 .tech-button-container {
     text-align: center;
     margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
 /* Själva knappen */
@@ -170,6 +175,18 @@ header h1 {
 /* Active-state (när man klickar) */
 .tech-button:active {
     transform: translateY(0);
+}
+
+/* UPPDATERING 2026-01-03: README-knapp som länk till GitHub */
+.readme-button {
+    background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%); /* GitHub-färger */
+    text-decoration: none; /* Ta bort länk-understrykning */
+}
+
+.readme-button:hover {
+    background: linear-gradient(135deg, #2d3339 0%, #24292e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(36, 41, 46, 0.5);
 }
 
 /* === 6. MODAL-FÖNSTER === */
