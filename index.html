@@ -8,6 +8,12 @@
     - Lagt till input-ruta för att lägga till egna bilder
     - Lagt till visning av aktuella bilder och väntande bilder (stack)
     - Uppdaterat teknisk dokumentation
+    
+    UPPDATERING 2026-01-04 (Issue #2):
+    - Utökat från 10 till 16 bilder
+    - Lagt till metadata (datum, tweet-URL) för 7 bilder
+    - Tooltip vid hover visar bildens datum
+    - Inledande text som beskriver collaget
 -->
 <html lang="sv">
 <head>
@@ -29,6 +35,13 @@
             <!-- Länk till Kent Lundgrens X-konto som källa -->
             <p class="source">Källa: <a href="https://x.com/kentlundgren" target="_blank" rel="noopener noreferrer">@kentlundgren på X</a></p>
         </header>
+
+        <!-- UPPDATERING 2026-01-04: Inledande beskrivning av bildcollaget -->
+        <p class="intro-text">
+            Här presenteras <strong>nio (9) bilder</strong> växelvis, av totalt <strong>16 bilder</strong>. 
+            Bilderna byts ut automatiskt var 4:e sekund. 
+            <em>Håll muspekaren över en bild för att se datum.</em>
+        </p>
 
         <!-- Rutnät för bildcollage - 3x3 bilder -->
         <div class="image-grid" id="imageGrid">
