@@ -690,19 +690,176 @@
             <div class="step-box">
                 <span class="step-number">7</span>
                 <h4>(Valfritt) Skapa versionsmapp för arkivering</h4>
+                <p>Om du vill att användare ska kunna köra äldre versioner direkt i webbläsaren via GitHub Pages, skapa en separat mapp:</p>
+                
                 <div class="git-command">
                     <code><span class="comment"># Skapa mapp för versionen</span></code><br>
                     <code>mkdir v2.4</code><br><br>
-                    <code><span class="comment"># Extrahera filer från taggen</span></code><br>
-                    <code>git show v2.4:index.html > v2.4/index.html</code><br>
-                    <code>git show v2.4:styles.css > v2.4/styles.css</code><br>
-                    <code>git show v2.4:javaScript.js > v2.4/javaScript.js</code>
+                    <code><span class="comment"># VIKTIGT: I PowerShell, använd Out-File med UTF-8 för svenska tecken!</span></code><br>
+                    <code>git show v2.4:index.html | Out-File -Encoding utf8 -FilePath v2.4/index.html</code><br>
+                    <code>git show v2.4:styles.css | Out-File -Encoding utf8 -FilePath v2.4/styles.css</code><br>
+                    <code>git show v2.4:javaScript.js | Out-File -Encoding utf8 -FilePath v2.4/javaScript.js</code>
+                </div>
+                
+                <div class="warning-box">
+                    <h4>⚠️ Varning om teckenkodning</h4>
+                    <p>Använd <strong>INTE</strong> vanlig omdirigering (<code>></code>) i PowerShell för filer med å, ä, ö:</p>
+                    <div class="git-command" style="margin: 10px 0;">
+                        <code><span class="comment"># ❌ FEL - ger Ã¥, Ã¤, Ã¶ istället för å, ä, ö</span></code><br>
+                        <code>git show v2.4:index.html > v2.4/index.html</code><br><br>
+                        <code><span class="comment"># ✅ RÄTT - bevarar svenska tecken</span></code><br>
+                        <code>git show v2.4:index.html | Out-File -Encoding utf8 -FilePath v2.4/index.html</code>
+                    </div>
+                </div>
+                
+                <h5>Vad gör kommandot "git show"?</h5>
+                <p><code>git show</code> visar innehållet i Git-objekt (commits, tags, filer). Med syntaxen <code>tag:filnamn</code> kan du se hur en fil såg ut vid en specifik version:</p>
+                
+                <div class="git-command">
+                    <code><span class="comment"># Visa hur index.html såg ut i v2.0</span></code><br>
+                    <code>git show v2.0:index.html</code><br><br>
+                    <code><span class="comment"># Visa information om en tag</span></code><br>
+                    <code>git show v2.0</code><br><br>
+                    <code><span class="comment"># Visa senaste commit</span></code><br>
+                    <code>git show HEAD</code><br><br>
+                    <code><span class="comment"># Visa en specifik commit</span></code><br>
+                    <code>git show abc1234</code>
                 </div>
             </div>
             
             <div class="success-box">
                 <h4>✅ Klart!</h4>
                 <p>Nu är din nya version publicerad och tillgänglig på GitHub Pages. Programmet visar automatiskt den nya versionen via GitHub API.</p>
+            </div>
+        </section>
+        
+        <!-- ============================================ -->
+        <!-- SEKTION: FÖRSTÅ GIT TAGS -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🏷️ Förstå Git Tags (versionsmarkörer)</h2>
+            
+            <p>En <strong>tag</strong> i Git är en permanent referens till en specifik commit. Tags används oftast för att markera releaseversioner (v1.0, v2.0, etc.).</p>
+            
+            <h3>Hur vet Git att det är en "tag"?</h3>
+            <p>Git lagrar tags som speciella objekt i <code>.git/refs/tags/</code>. När du kör <code>git tag</code> skapar Git antingen:</p>
+            
+            <div class="command-grid">
+                <div class="command-card">
+                    <h4>Lightweight tag</h4>
+                    <code>git tag v1.0</code>
+                    <p>Bara en pekare till en commit. Ingen metadata.</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4>Annoterad tag ✅</h4>
+                    <code>git tag -a v1.0 -m "Meddelande"</code>
+                    <p>Fullt Git-objekt med författare, datum, meddelande och signatur.</p>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h4>💡 Rekommendation</h4>
+                <p>Använd <strong>alltid annoterade tags</strong> (<code>-a</code>) för releases. De innehåller:</p>
+                <ul>
+                    <li>Vem som skapade taggen</li>
+                    <li>När taggen skapades</li>
+                    <li>Ett meddelande som beskriver versionen</li>
+                    <li>Möjlighet till GPG-signering</li>
+                </ul>
+            </div>
+            
+            <h3>Skapa en tag lokalt och pusha till GitHub</h3>
+            <div class="git-command">
+                <code><span class="comment"># Steg 1: Skapa annoterad tag lokalt</span></code><br>
+                <code>git tag -a v2.5 -m "Version 2.5: Ny funktion X och buggfix Y"</code><br><br>
+                <code><span class="comment"># Steg 2: Verifiera att taggen skapades</span></code><br>
+                <code>git tag</code><br>
+                <code><span class="comment"># Visar: v1.0, v2.0, v2.2, v2.4, v2.5</span></code><br><br>
+                <code><span class="comment"># Steg 3: Pusha taggen till GitHub</span></code><br>
+                <code>git push origin v2.5</code><br><br>
+                <code><span class="comment"># Alternativt: pusha ALLA tags</span></code><br>
+                <code>git push origin --tags</code>
+            </div>
+            
+            <h3>Kan man skapa tag på GitHub först?</h3>
+            <div class="highlight-box">
+                <h4>✅ Ja, det går!</h4>
+                <p>Du kan skapa en tag (och release) direkt på GitHub:</p>
+                <ol>
+                    <li>Gå till <strong>Releases → Create a new release</strong></li>
+                    <li>Skriv in ett nytt tag-namn (t.ex. "v2.5")</li>
+                    <li>GitHub skapar automatiskt taggen när du publicerar</li>
+                </ol>
+            </div>
+            
+            <p><strong>För att hämta taggen lokalt:</strong></p>
+            <div class="git-command">
+                <code><span class="comment"># Hämta alla tags från GitHub</span></code><br>
+                <code>git fetch --tags</code><br><br>
+                <code><span class="comment"># Nu finns v2.5 lokalt också</span></code><br>
+                <code>git tag</code>
+            </div>
+            
+            <h3>Kan tags användas för annat än versioner?</h3>
+            <div class="success-box">
+                <h4>✅ Ja! Tags kan användas för:</h4>
+                <ul>
+                    <li><strong>Releaseversioner</strong> - v1.0, v2.0, v3.0-beta</li>
+                    <li><strong>Milstolpar</strong> - sprint-1-done, feature-complete</li>
+                    <li><strong>Deployment-markörer</strong> - deployed-2026-01-04, prod-20260104</li>
+                    <li><strong>Backup-punkter</strong> - before-refactor, pre-migration</li>
+                    <li><strong>Review-punkter</strong> - code-review-1, audit-2026</li>
+                </ul>
+            </div>
+            
+            <h3>Skillnad mellan tag och branch</h3>
+            <table class="method-table">
+                <thead>
+                    <tr>
+                        <th>Egenskap</th>
+                        <th>Tag</th>
+                        <th>Branch</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Flyttbar?</td>
+                        <td>❌ Nej, pekar alltid på samma commit</td>
+                        <td>✅ Ja, flyttas vid varje commit</td>
+                    </tr>
+                    <tr>
+                        <td>Syfte</td>
+                        <td>Markera specifika punkter (releases)</td>
+                        <td>Aktiv utveckling</td>
+                    </tr>
+                    <tr>
+                        <td>Skapas</td>
+                        <td>git tag -a v1.0 -m "..."</td>
+                        <td>git branch feature-x</td>
+                    </tr>
+                    <tr>
+                        <td>Pushas</td>
+                        <td>git push origin v1.0</td>
+                        <td>git push origin feature-x</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Vanliga tag-kommandon</h3>
+            <div class="git-command">
+                <code><span class="comment"># Lista alla tags</span></code><br>
+                <code>git tag</code><br><br>
+                <code><span class="comment"># Visa info om en specifik tag</span></code><br>
+                <code>git show v2.0</code><br><br>
+                <code><span class="comment"># Skapa tag på gammal commit</span></code><br>
+                <code>git tag -a v1.5 abc1234 -m "Glömde tagga denna"</code><br><br>
+                <code><span class="comment"># Ta bort lokal tag</span></code><br>
+                <code>git tag -d v2.0-beta</code><br><br>
+                <code><span class="comment"># Ta bort remote tag</span></code><br>
+                <code>git push origin --delete v2.0-beta</code><br><br>
+                <code><span class="comment"># Checka ut en tag (read-only, "detached HEAD")</span></code><br>
+                <code>git checkout v2.0</code>
             </div>
         </section>
 
@@ -726,22 +883,53 @@
             <h3>Best Practice: Feature Branch Workflow</h3>
             <p>Använd <strong>alltid</strong> en separat branch för utveckling, även för små ändringar:</p>
             
-            <div class="git-command">
-                <code><span class="comment"># 1. Skapa och byt till utvecklingsbranch</span></code><br>
-                <code>git checkout -b utveckling</code><br>
-                <code><span class="comment"># eller med nya kommandot:</span></code><br>
-                <code>git switch -c utveckling</code><br><br>
-                <code><span class="comment"># 2. Gör dina ändringar, testa lokalt</span></code><br>
-                <code>git add .</code><br>
-                <code>git commit -m "Beskrivning av ändring"</code><br><br>
-                <code><span class="comment"># 3. Pusha utvecklingsbranchen till GitHub</span></code><br>
-                <code>git push origin utveckling</code><br><br>
-                <code><span class="comment"># 4. Skapa Pull Request på GitHub</span></code><br>
-                <code><span class="comment"># (gå till github.com/repo/pulls)</span></code><br><br>
-                <code><span class="comment"># 5. Efter review och godkännande: merga till main</span></code><br>
-                <code>git checkout main</code><br>
-                <code>git merge utveckling</code><br>
-                <code>git push origin main</code>
+            <div class="success-box">
+                <h4>🚀 Rekommenderat arbetsflöde (från och med v2.5)</h4>
+                <div class="git-command" style="background: #1a202c; border-radius: 8px;">
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># STEG 1: ALLTID börja med att skapa utvecklingsbranch</span></code><br>
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code>git switch -c utveckling</code><br><br>
+                    
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># STEG 2: Gör ändringar och testa lokalt</span></code><br>
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code>git add .</code><br>
+                    <code>git commit -m "Beskrivning av ändring"</code><br><br>
+                    
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># STEG 3: Pusha utvecklingsbranchen till GitHub</span></code><br>
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code>git push origin utveckling</code><br><br>
+                    
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># STEG 4: Skapa Pull Request på GitHub</span></code><br>
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># → Gå till github.com/lundgren9/Twitter/pulls</span></code><br>
+                    <code><span class="comment"># → Klicka "New pull request"</span></code><br>
+                    <code><span class="comment"># → Välj "compare: utveckling" → "base: main"</span></code><br>
+                    <code><span class="comment"># → Skriv beskrivning av ändringarna</span></code><br><br>
+                    
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># STEG 5: Efter godkännande - merga till main</span></code><br>
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code>git switch main</code><br>
+                    <code>git pull origin main    <span class="comment"># Hämta ev. ändringar</span></code><br>
+                    <code>git merge utveckling</code><br>
+                    <code>git push origin main</code><br><br>
+                    
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># STEG 6: Skapa version/tag och pusha</span></code><br>
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code>git tag -a v2.5 -m "Version 2.5: Kort beskrivning"</code><br>
+                    <code>git push origin v2.5</code><br><br>
+                    
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code><span class="comment"># STEG 7: Ta bort utvecklingsbranchen (cleanup)</span></code><br>
+                    <code><span class="comment"># ════════════════════════════════════════════════════</span></code><br>
+                    <code>git branch -d utveckling           <span class="comment"># Lokalt</span></code><br>
+                    <code>git push origin --delete utveckling <span class="comment"># Remote</span></code>
+                </div>
             </div>
             
             <h3>Hur undvika att av misstag arbeta i main?</h3>
