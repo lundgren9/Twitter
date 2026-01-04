@@ -2,23 +2,29 @@
 <!-- 
     BJERREDS SALTSJÖBAD - BILDCOLLAGE
     =================================
-    UPPDATERING 2026-01-03:
+    UPPDATERING 2026-01-03 (v1.0):
     - Ändrat CSS och JS-länkar till relativa sökvägar
     - Lagt till video-sektion med inbäddad Twitter-video
     - Lagt till input-ruta för att lägga till egna bilder
     - Lagt till visning av aktuella bilder och väntande bilder (stack)
     - Uppdaterat teknisk dokumentation
     
-    UPPDATERING 2026-01-04 (Issue #2):
+    UPPDATERING 2026-01-04 (v2.0):
     - Utökat från 10 till 16 bilder
     - Lagt till metadata (datum, tweet-URL) för 7 bilder
     - Tooltip vid hover visar bildens datum
     - Inledande text som beskriver collaget
     
-    UPPDATERING 2026-01-04 (version 2.0):
+    UPPDATERING 2026-01-04 (v2.2):
     - Lagt till GitHub-info box med kort introduktion
     - Lagt till versionsbadge som hämtar senaste version från GitHub API
     - Visar versionsnummer och release-datum automatiskt
+    
+    UPPDATERING 2026-01-04 (v2.4 - förberedelse):
+    - Lagt till versioner.html med komplett Git/GitHub dokumentation
+    - Lagt till "Versioner & Git-guide" knapp
+    - Skapat versionsmappar /v1.0/ och /v2.0/ för historiska versioner
+    - Dokumenterat GitHub Pages och hur versioner hanteras
 -->
 <html lang="sv">
 <head>
@@ -132,6 +138,7 @@
 
         <!-- Knappar för dokumentation -->
         <!-- UPPDATERING 2026-01-03: Lagt till README-knapp som länkar till GitHub -->
+        <!-- UPPDATERING 2026-01-04: Lagt till Versioner-knapp -->
         <div class="tech-button-container">
             <button class="tech-button" id="openModal">
                 <span class="tech-icon">⚙️</span> Teknisk Dokumentation
@@ -142,6 +149,11 @@
                class="tech-button readme-button"
                title="README.md är en dokumentationsfil som beskriver projektet. Den visas automatiskt på GitHub och innehåller: projektbeskrivning, installationsguide, användningsinstruktioner och tekniska detaljer. Öppnas i ny flik.">
                 <span class="tech-icon">📖</span> README på GitHub
+            </a>
+            <a href="versioner.html" 
+               class="tech-button versions-button"
+               title="Se tidigare versioner av programmet, lär dig om Git och GitHub, och hur versionshantering fungerar.">
+                <span class="tech-icon">📚</span> Versioner & Git-guide
             </a>
         </div>
 

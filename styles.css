@@ -994,3 +994,20 @@ header h1 {
         min-width: 100%;
     }
 }
+
+/* ============================================
+   UPPDATERING 2026-01-04: Versioner-knapp
+   ============================================ */
+
+/* Versioner-knapp styling */
+.versions-button {
+    background: linear-gradient(135deg, #8957e5 0%, #a371f7 100%) !important;
+    border-color: #8957e5 !important;
+}
+
+.versions-button:hover {
+    background: linear-gradient(135deg, #a371f7 0%, #c297ff 100%) !important;
+    border-color: #a371f7 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(137, 87, 229, 0.4);
+}

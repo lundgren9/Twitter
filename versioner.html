@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<!--
+    VERSIONSHISTORIK - BJERREDS SALTSJÖBAD
+    ======================================
+    Skapad: 2026-01-04
+    Uppdaterad: 2026-01-04 (v2.4)
+    
+    Denna sida förklarar:
+    - Hur man kan se tidigare versioner av programmet
+    - Vad GitHub Pages är och hur det fungerar
+    - Vanliga Git-kommandon för versionshantering
+    - Hur man skapar och hanterar versioner
+    - Skillnaden mellan git checkout och git switch
+-->
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versionshistorik - Bjerreds Saltsjöbad</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ============================================
+           LJUSARE FÄRGSCHEMA FÖR BÄTTRE LÄSBARHET
+           ============================================ */
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            color: #2d3748;
+        }
+        
+        .versions-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header styling */
+        .versions-container header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .versions-container header h1 {
+            color: white;
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        
+        .versions-container header .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+        }
+        
+        /* Version cards */
+        .version-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .version-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .version-card h3 {
+            color: #4a5568;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .version-card p {
+            color: #4a5568;
+        }
+        
+        .version-card ul {
+            color: #4a5568;
+        }
+        
+        .version-badge-large {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .version-badge-old {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+        }
+        
+        .version-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .version-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #edf2f7;
+            color: #4a5568;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .version-link:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* Section boxes */
+        .section-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-box h2 {
+            color: #2d3748;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+        
+        .section-box h3 {
+            color: #4a5568;
+            margin-top: 25px;
+        }
+        
+        .section-box h4 {
+            color: #667eea;
+        }
+        
+        .section-box p {
+            color: #4a5568;
+            line-height: 1.7;
+        }
+        
+        .section-box ul, .section-box ol {
+            color: #4a5568;
+            line-height: 1.8;
+        }
+        
+        .section-box a {
+            color: #667eea;
+        }
+        
+        .section-box a:hover {
+            color: #5a67d8;
+        }
+        
+        /* GitHub Pages image */
+        .github-pages-image {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Git command boxes */
+        .git-command {
+            background: #1a202c;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .git-command code {
+            color: #68d391;
+            background: none;
+            padding: 0;
+            font-size: 0.95em;
+        }
+        
+        .git-command .comment {
+            color: #a0aec0;
+        }
+        
+        /* Command grid */
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .command-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .command-card h4 {
+            color: #e53e3e;
+            margin-top: 0;
+            font-family: 'Consolas', monospace;
+        }
+        
+        .command-card p {
+            color: #4a5568;
+            margin: 10px 0;
+        }
+        
+        .command-card code {
+            background: #1a202c;
+            color: #68d391;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        /* Video grid */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 25px 0;
+        }
+        
+        .video-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: #edf2f7;
+        }
+        
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-thumbnail .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 68px;
+            height: 48px;
+            background: rgba(255, 0, 0, 0.9);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .video-thumbnail .play-button::after {
+            content: '';
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 5px;
+        }
+        
+        .video-card-content {
+            padding: 15px;
+        }
+        
+        .video-card h4 {
+            margin: 0 0 8px 0;
+            color: #2d3748;
+            font-size: 1em;
+        }
+        
+        .video-card p {
+            margin: 0;
+            color: #718096;
+            font-size: 0.9em;
+        }
+        
+        /* Git illustrations */
+        .git-illustration {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, #ebf8ff 0%, #e6fffa 100%);
+            border-left: 4px solid #3182ce;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .highlight-box h4 {
+            color: #2b6cb0;
+            margin-top: 0;
+        }
+        
+        .highlight-box p, .highlight-box li {
+            color: #2d3748;
+        }
+        
+        /* Warning box */
+        .warning-box {
+            background: linear-gradient(135deg, #fffaf0 0%, #fefcbf 100%);
+            border-left: 4px solid #d69e2e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-box h4 {
+            color: #b7791f;
+            margin-top: 0;
+        }
+        
+        .warning-box p {
+            color: #744210;
+        }
+        
+        /* Success box */
+        .success-box {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border-left: 4px solid #38a169;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .success-box h4 {
+            color: #276749;
+            margin-top: 0;
+        }
+        
+        .success-box p, .success-box li {
+            color: #22543d;
+        }
+        
+        /* Method comparison table */
+        .method-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        
+        .method-table th,
+        .method-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .method-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .method-table td {
+            background: white;
+            color: #4a5568;
+        }
+        
+        .method-table tr:nth-child(even) td {
+            background: #f7fafc;
+        }
+        
+        .method-table tr:hover td {
+            background: #edf2f7;
+        }
+        
+        /* References */
+        .references {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .references h3 {
+            color: #e53e3e;
+            margin-top: 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        
+        .references ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .references li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .references li:last-child {
+            border-bottom: none;
+        }
+        
+        .references a {
+            color: #667eea;
+        }
+        
+        /* Back button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(72, 187, 120, 0.4);
+            color: white;
+        }
+        
+        /* Step boxes for creating versions */
+        .step-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .step-box h4 {
+            color: #667eea;
+            margin-top: 5px;
+        }
+        
+        /* Comparison table for checkout vs switch */
+        .comparison-highlight {
+            background: #fef3c7;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #92400e;
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        .versions-footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .versions-footer p {
+            color: #718096;
+        }
+        
+        .versions-footer a {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container versions-container">
+        
+        <!-- Header -->
+        <header>
+            <h1>📚 Versionshistorik</h1>
+            <p class="subtitle">Bjerreds Saltsjöbad - Bildcollage</p>
+            <a href="index.html" class="back-button">← Tillbaka till programmet</a>
+        </header>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 1: TILLGÄNGLIGA VERSIONER -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🏷️ Tillgängliga versioner</h2>
+            <p>Här kan du se och testa olika versioner av programmet. Varje version är bevarad som en separat mapp på GitHub Pages.</p>
+            
+            <!-- Version 2.4 (Aktuell) -->
+            <div class="version-card">
+                <h3>
+                    <span class="version-badge-large">v2.4</span>
+                    Version 2.4 - Versionshistorik & Git-guide
+                    <span style="color: #38a169; font-size: 0.8em; font-weight: 600;">✓ AKTUELL</span>
+                </h3>
+                <p><strong>Släppt:</strong> 4 januari 2026</p>
+                <p><strong>Nyheter:</strong></p>
+                <ul>
+                    <li>📚 Ny <code>versioner.html</code> med komplett Git-dokumentation</li>
+                    <li>🗂️ Versionsmappar för v1.0, v2.0 och v2.2</li>
+                    <li>🎬 Videoresurser om Git och GitHub</li>
+                    <li>📖 Harvard-formaterade referenser</li>
+                </ul>
+                <div class="version-links">
+                    <a href="index.html" class="version-link">🚀 Kör version 2.4 (aktuell)</a>
+                    <a href="https://github.com/lundgren9/Twitter/releases/tag/v2.4" target="_blank" class="version-link">📋 Release notes</a>
+                </div>
+            </div>
+            
+            <!-- Version 2.2 -->
+            <div class="version-card">
+                <h3>
+                    <span class="version-badge-large version-badge-old">v2.2</span>
+                    Version 2.2 - Versionsbadge & GitHub-info
+                </h3>
+                <p><strong>Släppt:</strong> 4 januari 2026</p>
+                <p><strong>Nyheter:</strong></p>
+                <ul>
+                    <li>🏷️ Versionsbadge som hämtas automatiskt från GitHub API</li>
+                    <li>📦 GitHub-info box med Open Source-introduktion</li>
+                    <li>📚 Utökad README med Git-dokumentation</li>
+                </ul>
+                <div class="version-links">
+                    <a href="v2.2/index.html" class="version-link">🚀 Kör version 2.2</a>
+                    <a href="https://github.com/lundgren9/Twitter/releases/tag/v2.2" target="_blank" class="version-link">📋 Release notes</a>
+                </div>
+            </div>
+            
+            <!-- Version 2.0 -->
+            <div class="version-card">
+                <h3>
+                    <span class="version-badge-large version-badge-old">v2.0</span>
+                    Version 2.0 - 16 bilder med Lightbox
+                </h3>
+                <p><strong>Släppt:</strong> 4 januari 2026</p>
+                <p><strong>Nyheter:</strong></p>
+                <ul>
+                    <li>🖼️ Utökad bildbank från 10 till 16 bilder</li>
+                    <li>🔍 Lightbox för fullskärmsvisning</li>
+                    <li>🔗 "Öppna på X" för att se original-tweet</li>
+                    <li>📅 Tooltip med datum vid hover</li>
+                </ul>
+                <div class="version-links">
+                    <a href="v2.0/index.html" class="version-link">🚀 Kör version 2.0</a>
+                    <a href="https://github.com/lundgren9/Twitter/releases/tag/v2.0" target="_blank" class="version-link">📋 Release notes</a>
+                </div>
+            </div>
+            
+            <!-- Version 1.0 -->
+            <div class="version-card">
+                <h3>
+                    <span class="version-badge-large version-badge-old">v1.0</span>
+                    Version 1.0 - Ursprunglig release
+                </h3>
+                <p><strong>Släppt:</strong> 3 januari 2026</p>
+                <p><strong>Funktioner:</strong></p>
+                <ul>
+                    <li>🖼️ 10 bilder från #Bjerredssaltsjobad</li>
+                    <li>🎬 Inbäddad Twitter-video</li>
+                    <li>➕ Input-ruta för egna bilder</li>
+                    <li>💾 localStorage för sparade bilder</li>
+                </ul>
+                <div class="version-links">
+                    <a href="v1.0/index.html" class="version-link">🚀 Kör version 1.0</a>
+                    <a href="https://github.com/lundgren9/Twitter/releases/tag/Release" target="_blank" class="version-link">📋 Release notes</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 2: HUR MAN SKAPAR EN NY VERSION -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🚀 Hur man skapar en ny version</h2>
+            <p>Här är en steg-för-steg guide för att skapa en ny version av programmet:</p>
+            
+            <div class="step-box">
+                <span class="step-number">1</span>
+                <h4>Gör dina ändringar</h4>
+                <p>Redigera filerna (HTML, CSS, JavaScript) med de förbättringar du vill göra.</p>
+            </div>
+            
+            <div class="step-box">
+                <span class="step-number">2</span>
+                <h4>Lägg till ändringar till staging</h4>
+                <div class="git-command">
+                    <code><span class="comment"># Lägg till alla ändrade filer</span></code><br>
+                    <code>git add .</code><br><br>
+                    <code><span class="comment"># Eller lägg till specifika filer</span></code><br>
+                    <code>git add index.html styles.css</code>
+                </div>
+            </div>
+            
+            <div class="step-box">
+                <span class="step-number">3</span>
+                <h4>Commita ändringarna</h4>
+                <div class="git-command">
+                    <code>git commit -m "v2.4: Beskrivning av vad som ändrats"</code>
+                </div>
+                <p><strong>Tips:</strong> Skriv tydliga commit-meddelanden som beskriver VAD du ändrat och VARFÖR.</p>
+            </div>
+            
+            <div class="step-box">
+                <span class="step-number">4</span>
+                <h4>Pusha till GitHub</h4>
+                <div class="git-command">
+                    <code>git push origin main</code>
+                </div>
+            </div>
+            
+            <div class="step-box">
+                <span class="step-number">5</span>
+                <h4>Skapa en tag för versionen</h4>
+                <div class="git-command">
+                    <code><span class="comment"># Skapa annoterad tag med beskrivning</span></code><br>
+                    <code>git tag -a v2.4 -m "Version 2.4: Kort beskrivning"</code><br><br>
+                    <code><span class="comment"># Pusha taggen till GitHub</span></code><br>
+                    <code>git push origin v2.4</code>
+                </div>
+            </div>
+            
+            <div class="step-box">
+                <span class="step-number">6</span>
+                <h4>Skapa Release på GitHub</h4>
+                <ol>
+                    <li>Gå till <a href="https://github.com/lundgren9/Twitter/releases/new" target="_blank">github.com/.../releases/new</a></li>
+                    <li>Välj din nya tag (t.ex. v2.4)</li>
+                    <li>Skriv release title och release notes</li>
+                    <li>Klicka "Publish release"</li>
+                </ol>
+            </div>
+            
+            <div class="step-box">
+                <span class="step-number">7</span>
+                <h4>(Valfritt) Skapa versionsmapp för arkivering</h4>
+                <div class="git-command">
+                    <code><span class="comment"># Skapa mapp för versionen</span></code><br>
+                    <code>mkdir v2.4</code><br><br>
+                    <code><span class="comment"># Extrahera filer från taggen</span></code><br>
+                    <code>git show v2.4:index.html > v2.4/index.html</code><br>
+                    <code>git show v2.4:styles.css > v2.4/styles.css</code><br>
+                    <code>git show v2.4:javaScript.js > v2.4/javaScript.js</code>
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>✅ Klart!</h4>
+                <p>Nu är din nya version publicerad och tillgänglig på GitHub Pages. Programmet visar automatiskt den nya versionen via GitHub API.</p>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 3: GIT CHECKOUT VS GIT SWITCH -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🔄 git checkout vs git switch - Vad är skillnaden?</h2>
+            
+            <p>Båda kommandona kan användas för att byta branch, men det finns viktiga skillnader:</p>
+            
+            <div class="highlight-box">
+                <h4>📜 Historisk bakgrund</h4>
+                <p><code>git checkout</code> är det <strong>äldre kommandot</strong> (funnits sedan Git skapades). Det gör MÅNGA olika saker, vilket kan vara förvirrande. Därför skapades <code>git switch</code> och <code>git restore</code> i <strong>Git 2.23 (2019)</strong> för att dela upp funktionaliteten (Chacon och Straub, 2014).</p>
+            </div>
+            
+            <h3>Vad gör git checkout?</h3>
+            <p><code>git checkout</code> är ett "multi-tool" som gör <strong>flera olika saker</strong>:</p>
+            
+            <div class="command-grid">
+                <div class="command-card">
+                    <h4>1. Byta branch</h4>
+                    <code>git checkout main</code>
+                    <p>Byter till branch "main"</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4>2. Skapa + byta branch</h4>
+                    <code>git checkout -b ny-branch</code>
+                    <p>Skapar och byter till "ny-branch"</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4>3. Återställa filer</h4>
+                    <code>git checkout -- fil.txt</code>
+                    <p>Återställer fil.txt till senaste commit</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4>4. Checka ut tag/commit</h4>
+                    <code>git checkout v2.0</code>
+                    <p>Går till specifik version (detached HEAD)</p>
+                </div>
+            </div>
+            
+            <h3>Vad gör git switch?</h3>
+            <p><code>git switch</code> gör <strong>EN sak</strong> - byter branch:</p>
+            
+            <div class="command-grid">
+                <div class="command-card">
+                    <h4>Byta branch</h4>
+                    <code>git switch main</code>
+                    <p>Byter till branch "main"</p>
+                </div>
+                
+                <div class="command-card">
+                    <h4>Skapa + byta branch</h4>
+                    <code>git switch -c ny-branch</code>
+                    <p>Skapar och byter till "ny-branch"</p>
+                </div>
+            </div>
+            
+            <h3>Och git restore?</h3>
+            <p><code>git restore</code> gör <strong>EN sak</strong> - återställer filer:</p>
+            
+            <div class="git-command">
+                <code><span class="comment"># Återställ fil till senaste commit</span></code><br>
+                <code>git restore fil.txt</code><br><br>
+                <code><span class="comment"># Ta bort fil från staging</span></code><br>
+                <code>git restore --staged fil.txt</code>
+            </div>
+            
+            <a href="git_checkout_get_switch.jpg" target="_blank">
+                <img src="git_checkout_get_switch.jpg" alt="Git Checkout vs Switch" class="git-illustration">
+            </a>
+            <p style="text-align: center; color: #718096;"><em>Bild: Jämförelse av git checkout, switch och restore (ByteByteGo, 2024)</em></p>
+            
+            <h3>Jämförelsetabell</h3>
+            <table class="method-table">
+                <thead>
+                    <tr>
+                        <th>Åtgärd</th>
+                        <th>Gammalt kommando</th>
+                        <th>Nytt kommando (rekommenderat)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Byta till befintlig branch</td>
+                        <td><code>git checkout main</code></td>
+                        <td><code>git switch main</code></td>
+                    </tr>
+                    <tr>
+                        <td>Skapa och byta till ny branch</td>
+                        <td><code>git checkout -b ny</code></td>
+                        <td><code>git switch -c ny</code></td>
+                    </tr>
+                    <tr>
+                        <td>Återställa fil</td>
+                        <td><code>git checkout -- fil.txt</code></td>
+                        <td><code>git restore fil.txt</code></td>
+                    </tr>
+                    <tr>
+                        <td>Gå till specifik tag/commit</td>
+                        <td><code>git checkout v2.0</code></td>
+                        <td><code>git switch --detach v2.0</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="warning-box">
+                <h4>⚠️ Varför spelar det roll?</h4>
+                <p>Med <code>git checkout</code> kan du <strong>av misstag</strong> skriva över filer om du skriver fel:</p>
+                <div class="git-command">
+                    <code><span class="comment"># Du ville byta till branch "main"...</span></code><br>
+                    <code>git checkout main</code><br><br>
+                    <code><span class="comment"># Men om "main" INTE är en branch utan en FIL,</span></code><br>
+                    <code><span class="comment"># återställs filen istället! 😱</span></code>
+                </div>
+                <p>Med <code>git switch</code> får du ett <strong>tydligt felmeddelande</strong> om branchen inte finns.</p>
+            </div>
+            
+            <div class="success-box">
+                <h4>✅ Rekommendation</h4>
+                <p>Använd de <strong>nya kommandona</strong> (git switch, git restore) när du kan. De är:</p>
+                <ul>
+                    <li>🎯 <strong>Tydligare</strong> - gör bara en sak</li>
+                    <li>🛡️ <strong>Säkrare</strong> - mindre risk för misstag</li>
+                    <li>📚 <strong>Lättare att lära sig</strong></li>
+                </ul>
+                <p><strong>OBS:</strong> <code>git checkout</code> fungerar fortfarande och kommer inte försvinna!</p>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 4: METODER FÖR ATT SE GAMLA VERSIONER -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🔍 Metoder för att återgå till tidigare versioner</h2>
+            <p>Det finns flera sätt att se och använda äldre versioner av ett program:</p>
+            
+            <h3>Metod 1: Versionsmappar på GitHub Pages ✅ (används här)</h3>
+            <div class="highlight-box">
+                <h4>Rekommenderad metod för demo</h4>
+                <p>Vi skapar separata mappar för varje version:</p>
+                <div class="git-command">
+                    <code>/             → Senaste versionen (v2.4)</code><br>
+                    <code>/v2.2/        → Version 2.2</code><br>
+                    <code>/v2.0/        → Version 2.0</code><br>
+                    <code>/v1.0/        → Version 1.0</code>
+                </div>
+                <p><strong>Fördelar:</strong> Permanent tillgängligt via URL, enkelt att dela</p>
+                <p><strong>Nackdelar:</strong> Kräver manuell kopiering av filer</p>
+            </div>
+            
+            <h3>Metod 2: Git checkout/switch lokalt</h3>
+            <div class="git-command">
+                <code><span class="comment"># Visa alla versioner/tags</span></code><br>
+                <code>git tag</code><br><br>
+                <code><span class="comment"># Checka ut en specifik version (gammalt sätt)</span></code><br>
+                <code>git checkout v2.0</code><br><br>
+                <code><span class="comment"># Checka ut en specifik version (nytt sätt)</span></code><br>
+                <code>git switch --detach v2.0</code><br><br>
+                <code><span class="comment"># Gå tillbaka till senaste versionen</span></code><br>
+                <code>git switch main</code>
+            </div>
+            
+            <h3>Metod 3: Ladda ner zip från GitHub Release</h3>
+            <ol>
+                <li>Gå till <a href="https://github.com/lundgren9/Twitter/releases" target="_blank">Releases på GitHub</a></li>
+                <li>Välj önskad version (t.ex. v2.0)</li>
+                <li>Klicka på "Source code (zip)"</li>
+                <li>Packa upp och öppna <code>index.html</code></li>
+            </ol>
+            
+            <h3>Jämförelse av metoder</h3>
+            <table class="method-table">
+                <thead>
+                    <tr>
+                        <th>Metod</th>
+                        <th>Svårighet</th>
+                        <th>Delbar URL</th>
+                        <th>Kräver Git</th>
+                        <th>Bäst för</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Versionsmappar</td>
+                        <td>🟢 Lätt</td>
+                        <td>✅ Ja</td>
+                        <td>❌ Nej</td>
+                        <td>Demo för andra</td>
+                    </tr>
+                    <tr>
+                        <td>Git checkout/switch</td>
+                        <td>🟡 Medel</td>
+                        <td>❌ Nej</td>
+                        <td>✅ Ja</td>
+                        <td>Utvecklare</td>
+                    </tr>
+                    <tr>
+                        <td>Ladda ner zip</td>
+                        <td>🟢 Lätt</td>
+                        <td>❌ Nej</td>
+                        <td>❌ Nej</td>
+                        <td>Snabb test</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 5: VAD ÄR GITHUB PAGES? -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🌐 Vad är GitHub Pages?</h2>
+            
+            <p><strong>GitHub Pages</strong> är en gratis webbtjänst från GitHub som låter dig publicera webbsidor direkt från ett GitHub-repository (GitHub, 2026). Det är perfekt för:</p>
+            <ul>
+                <li>📄 Dokumentation och README-filer</li>
+                <li>🎨 Portfolios och personliga sidor</li>
+                <li>🚀 Demo-sidor för projekt</li>
+                <li>📝 Bloggar (med Jekyll)</li>
+            </ul>
+            
+            <h3>Hur aktiverar man GitHub Pages?</h3>
+            <p>Gå till <strong>Settings → Pages</strong> i ditt repository:</p>
+            
+            <a href="GitHub_pages.jpg" target="_blank">
+                <img src="GitHub_pages.jpg" alt="GitHub Pages inställningar" class="github-pages-image">
+            </a>
+            <p style="text-align: center; color: #718096;"><em>Bild: GitHub Pages-inställningar på <a href="https://github.com/lundgren9/Twitter/settings/pages" target="_blank">github.com/lundgren9/Twitter/settings/pages</a></em></p>
+            
+            <h3>Hur fungerar det?</h3>
+            <div class="highlight-box">
+                <h4>🔑 Viktigt att förstå</h4>
+                <p>GitHub Pages serverar <strong>EN branch</strong> (vanligtvis <code>main</code>) som en webbsida. Alla filer i den branchen blir tillgängliga via URL.</p>
+            </div>
+            
+            <h4>1. En webbsida per repository</h4>
+            <p>Varje repository får en URL baserad på:</p>
+            <div class="git-command">
+                <code>https://{användarnamn}.github.io/{repository-namn}/</code><br><br>
+                <code><span class="comment"># Exempel för detta projekt:</span></code><br>
+                <code>https://lundgren9.github.io/Twitter/</code>
+            </div>
+            
+            <h4>2. Mappar blir sökvägar</h4>
+            <p>Om du skapar mappar i repositoryt blir de tillgängliga som URL-sökvägar:</p>
+            <div class="git-command">
+                <code>/index.html      → lundgren9.github.io/Twitter/</code><br>
+                <code>/v2.2/index.html → lundgren9.github.io/Twitter/v2.2/</code><br>
+                <code>/v2.0/index.html → lundgren9.github.io/Twitter/v2.0/</code><br>
+                <code>/v1.0/index.html → lundgren9.github.io/Twitter/v1.0/</code>
+            </div>
+            
+            <h4>3. Kan man skapa flera webbsidor?</h4>
+            <div class="warning-box">
+                <h4>⚠️ Begränsning</h4>
+                <p>Du kan <strong>inte</strong> skapa flera separata webbsidor från samma repository via GitHub Pages-inställningarna. Men du <strong>kan</strong> skapa undermappar som fungerar som separata "sidor".</p>
+            </div>
+            
+            <h3>GitHub Pages vs traditionellt webbhotell</h3>
+            <table class="method-table">
+                <thead>
+                    <tr>
+                        <th>Egenskap</th>
+                        <th>GitHub Pages</th>
+                        <th>Traditionellt webbhotell</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kostnad</td>
+                        <td>✅ Gratis</td>
+                        <td>💰 ~50-200 kr/månad</td>
+                    </tr>
+                    <tr>
+                        <td>Statiska filer (HTML, CSS, JS)</td>
+                        <td>✅ Ja</td>
+                        <td>✅ Ja</td>
+                    </tr>
+                    <tr>
+                        <td>Server-side kod (PHP, Python)</td>
+                        <td>❌ Nej</td>
+                        <td>✅ Ja</td>
+                    </tr>
+                    <tr>
+                        <td>Databas</td>
+                        <td>❌ Nej</td>
+                        <td>✅ Ja</td>
+                    </tr>
+                    <tr>
+                        <td>HTTPS</td>
+                        <td>✅ Automatiskt</td>
+                        <td>⚠️ Ibland extra kostnad</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 6: GIT-KOMMANDON -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>⚙️ Vanliga Git-kommandon</h2>
+            
+            <p>Git är ett <strong>versionshanteringssystem</strong> som spårar ändringar i filer och låter flera personer samarbeta på samma projekt (Chacon och Straub, 2014).</p>
+            
+            <h3>Git's arkitektur</h3>
+            <a href="How_Git_Actually_Works.jpg" target="_blank">
+                <img src="How_Git_Actually_Works.jpg" alt="How Git Actually Works" class="git-illustration">
+            </a>
+            <p style="text-align: center; color: #718096;"><em>Bild: Git's arkitektur (ByteByteGo, 2024)</em></p>
+            
+            <h3>Grundläggande arbetsflöde</h3>
+            <div class="command-grid">
+                <div class="command-card">
+                    <h4>git add</h4>
+                    <p>Lägger till ändringar till "staging area"</p>
+                    <code>git add .</code>
+                </div>
+                
+                <div class="command-card">
+                    <h4>git commit</h4>
+                    <p>Sparar ändringarna lokalt</p>
+                    <code>git commit -m "Meddelande"</code>
+                </div>
+                
+                <div class="command-card">
+                    <h4>git push</h4>
+                    <p>Skickar commits till GitHub</p>
+                    <code>git push origin main</code>
+                </div>
+                
+                <div class="command-card">
+                    <h4>git pull</h4>
+                    <p>Hämtar ändringar från GitHub</p>
+                    <code>git pull origin main</code>
+                </div>
+            </div>
+            
+            <h3>Git Pull = Git Fetch + Git Merge</h3>
+            <a href="git_pull_lika_med_git_fetch_och_git_merge.jpg" target="_blank">
+                <img src="git_pull_lika_med_git_fetch_och_git_merge.jpg" alt="Git Pull förklarat" class="git-illustration">
+            </a>
+            <p style="text-align: center; color: #718096;"><em>Bild: Git pull förklarat (ByteByteGo, 2024)</em></p>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 7: VIDEORESURSER -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🎬 Videoresurser om Git och GitHub</h2>
+            <p>Här är rekommenderade videos för att lära sig Git och GitHub:</p>
+            
+            <div class="video-grid">
+                <a href="https://www.youtube.com/watch?v=e9lnsKot_SQ" target="_blank" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/e9lnsKot_SQ/maxresdefault.jpg" alt="How Git Works" onerror="this.src='https://img.youtube.com/vi/e9lnsKot_SQ/hqdefault.jpg'">
+                        <div class="play-button"></div>
+                    </div>
+                    <div class="video-card-content">
+                        <h4>How Git Works: Explained in 4 Minutes</h4>
+                        <p>ByteByteGo • Kort och koncis</p>
+                    </div>
+                </a>
+                
+                <a href="https://youtu.be/tRZGeaHPoaw" target="_blank" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/tRZGeaHPoaw/maxresdefault.jpg" alt="Git Tutorial for Beginners" onerror="this.src='https://img.youtube.com/vi/tRZGeaHPoaw/hqdefault.jpg'">
+                        <div class="play-button"></div>
+                    </div>
+                    <div class="video-card-content">
+                        <h4>Git and GitHub Tutorial for Beginners</h4>
+                        <p>Kevin Stratvert • Nybörjarguide</p>
+                    </div>
+                </a>
+                
+                <a href="https://www.youtube.com/watch?v=mJ-qvsxPHpY" target="_blank" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/mJ-qvsxPHpY/maxresdefault.jpg" alt="Git Tutorial For Dummies" onerror="this.src='https://img.youtube.com/vi/mJ-qvsxPHpY/hqdefault.jpg'">
+                        <div class="play-button"></div>
+                    </div>
+                    <div class="video-card-content">
+                        <h4>Git Tutorial For Dummies</h4>
+                        <p>Nick White • Steg-för-steg</p>
+                    </div>
+                </a>
+                
+                <a href="https://youtu.be/lLoJHifWTRw" target="_blank" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/lLoJHifWTRw/maxresdefault.jpg" alt="Learn Git in 1 Hour" onerror="this.src='https://img.youtube.com/vi/lLoJHifWTRw/hqdefault.jpg'">
+                        <div class="play-button"></div>
+                    </div>
+                    <div class="video-card-content">
+                        <h4>Learn Git and GitHub in 1 Hour!</h4>
+                        <p>Crash course</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION 8: REFERENSER -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>📖 Referenser</h2>
+            
+            <div class="references">
+                <h3>Böcker och dokumentation</h3>
+                <ul>
+                    <li>Chacon, S. och Straub, B. (2014) <em>Pro Git</em>. 2:a upplagan. Apress. Tillgänglig: <a href="https://git-scm.com/book/en/v2" target="_blank">https://git-scm.com/book/en/v2</a> (Hämtad: 4 januari 2026).</li>
+                    <li>GitHub (2026) <em>GitHub Docs</em>. Tillgänglig: <a href="https://docs.github.com" target="_blank">https://docs.github.com</a> (Hämtad: 4 januari 2026).</li>
+                    <li>GitHub (2026) <em>GitHub Pages Documentation</em>. Tillgänglig: <a href="https://docs.github.com/en/pages" target="_blank">https://docs.github.com/en/pages</a> (Hämtad: 4 januari 2026).</li>
+                </ul>
+                
+                <h3>Videoresurser</h3>
+                <ul>
+                    <li>ByteByteGo (2024) <em>How Git Works: Explained in 4 Minutes</em> [Video]. YouTube. Tillgänglig: <a href="https://www.youtube.com/watch?v=e9lnsKot_SQ" target="_blank">https://www.youtube.com/watch?v=e9lnsKot_SQ</a> (Hämtad: 4 januari 2026).</li>
+                    <li>Stratvert, K. (2024) <em>Git and GitHub Tutorial for Beginners</em> [Video]. YouTube. Tillgänglig: <a href="https://youtu.be/tRZGeaHPoaw" target="_blank">https://youtu.be/tRZGeaHPoaw</a> (Hämtad: 4 januari 2026).</li>
+                    <li>White, N. (2024) <em>Git Tutorial For Dummies</em> [Video]. YouTube. Tillgänglig: <a href="https://www.youtube.com/watch?v=mJ-qvsxPHpY" target="_blank">https://www.youtube.com/watch?v=mJ-qvsxPHpY</a> (Hämtad: 4 januari 2026).</li>
+                    <li>Programming with Mosh (2024) <em>Learn Git and GitHub in 1 Hour</em> [Video]. YouTube. Tillgänglig: <a href="https://youtu.be/lLoJHifWTRw" target="_blank">https://youtu.be/lLoJHifWTRw</a> (Hämtad: 4 januari 2026).</li>
+                </ul>
+                
+                <h3>Illustrationer</h3>
+                <ul>
+                    <li>ByteByteGo (2024) <em>Git Architecture Diagrams</em>. Tillgänglig: <a href="https://www.youtube.com/@ByteByteGo" target="_blank">https://www.youtube.com/@ByteByteGo</a> (Hämtad: 4 januari 2026).</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="versions-footer">
+            <p>
+                <strong>Bjerreds Saltsjöbad - Bildcollage</strong><br>
+                Open Source på <a href="https://github.com/lundgren9/Twitter" target="_blank">GitHub</a>
+            </p>
+            <a href="index.html" class="back-button">← Tillbaka till programmet</a>
+        </footer>
+
+    </div>
+</body>
+</html>
