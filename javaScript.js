@@ -180,6 +180,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ladda Twitter widget för video embed
     loadTwitterWidget();
     
+    // UPPDATERING 2026-01-04: Hämta och visa versionsinformation från GitHub
+    fetchVersionFromGitHub();
+    
     console.log('Initialisering klar!');
 });
 
@@ -799,7 +802,73 @@ function loadTwitterWidget() {
     document.body.appendChild(script);
 }
 
-// === 10. DEBUG & HJÄLPFUNKTIONER ===
+// === 10. GITHUB VERSION HÄMTNING ===
+// UPPDATERING 2026-01-04: Hämtar och visar versionsinformation från GitHub
+
+/**
+ * Hämtar senaste release/version från GitHub API och visar den på sidan
+ * Använder GitHub API: https://api.github.com/repos/{owner}/{repo}/releases/latest
+ */
+async function fetchVersionFromGitHub() {
+    const versionBadge = document.getElementById('versionBadge');
+    const versionText = document.getElementById('versionText');
+    
+    if (!versionBadge || !versionText) {
+        console.log('Versionselement hittades inte');
+        return;
+    }
+    
+    // Visa laddningsindikator
+    versionBadge.classList.add('loading');
+    versionText.textContent = 'Laddar...';
+    
+    try {
+        // Hämta senaste release från GitHub API
+        const response = await fetch('https://api.github.com/repos/lundgren9/Twitter/releases/latest', {
+            headers: {
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const release = await response.json();
+        
+        // Formatera datum
+        const releaseDate = new Date(release.published_at);
+        const formattedDate = releaseDate.toLocaleDateString('sv-SE', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        
+        // Uppdatera badge
+        versionBadge.classList.remove('loading');
+        versionText.innerHTML = `${release.tag_name} <span class="version-date">${formattedDate}</span>`;
+        versionBadge.title = `${release.name || release.tag_name}\nSläppt: ${formattedDate}\nKlicka för att se på GitHub`;
+        
+        // Gör badge klickbar
+        versionBadge.style.cursor = 'pointer';
+        versionBadge.addEventListener('click', function() {
+            window.open(release.html_url, '_blank');
+        });
+        
+        console.log(`Version hämtad: ${release.tag_name} (${formattedDate})`);
+        
+    } catch (error) {
+        console.error('Fel vid hämtning av version:', error);
+        
+        // Visa fallback-version
+        versionBadge.classList.remove('loading');
+        versionBadge.classList.add('error');
+        versionText.textContent = 'v2.0';
+        versionBadge.title = 'Kunde inte hämta senaste version från GitHub';
+    }
+}
+
+// === 11. DEBUG & HJÄLPFUNKTIONER ===
 
 /**
  * Stoppar bildväxlingen (användbar för debugging)

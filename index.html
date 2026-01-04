@@ -14,6 +14,11 @@
     - Lagt till metadata (datum, tweet-URL) för 7 bilder
     - Tooltip vid hover visar bildens datum
     - Inledande text som beskriver collaget
+    
+    UPPDATERING 2026-01-04 (version 2.0):
+    - Lagt till GitHub-info box med kort introduktion
+    - Lagt till versionsbadge som hämtar senaste version från GitHub API
+    - Visar versionsnummer och release-datum automatiskt
 -->
 <html lang="sv">
 <head>
@@ -37,6 +42,21 @@
         </header>
 
         <!-- UPPDATERING 2026-01-04: Inledande beskrivning av bildcollaget -->
+        <!-- UPPDATERING 2026-01-04: Lagt till GitHub-info och versionsnummer -->
+        <div class="github-info-box">
+            <div class="version-badge" id="versionBadge" title="Laddar version...">
+                <span class="version-icon">🏷️</span>
+                <span id="versionText">Laddar...</span>
+            </div>
+            <p class="github-intro">
+                <strong>Open Source på GitHub</strong> — Detta program är öppen källkod och finns på 
+                <a href="https://github.com/lundgren9/Twitter" target="_blank" rel="noopener noreferrer">GitHub</a>. 
+                Där kan du ladda ner koden, läsa dokumentation, och se hur programmet utvecklats. 
+                Git och GitHub gör det möjligt att dela kod, samarbeta och hantera olika versioner på ett kontrollerat sätt.
+                <a href="https://github.com/lundgren9/Twitter#readme" target="_blank" rel="noopener noreferrer">Läs mer i README →</a>
+            </p>
+        </div>
+
         <p class="intro-text">
             Här presenteras <strong>nio (9) bilder</strong> växelvis, av totalt <strong>16 bilder</strong>. 
             Bilderna byts ut automatiskt var 4:e sekund. 

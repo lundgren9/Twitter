@@ -886,3 +886,111 @@ header h1 {
         font-size: 1.2em;
     }
 }
+
+/* ============================================
+   UPPDATERING 2026-01-04: GitHub-info och versionsbadge
+   ============================================ */
+
+/* Container för GitHub-information */
+.github-info-box {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Versionsbadge */
+.version-badge {
+    background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95em;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(46, 160, 67, 0.3);
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.version-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 160, 67, 0.4);
+}
+
+.version-badge.loading {
+    background: linear-gradient(135deg, #6e7681 0%, #8b949e 100%);
+    animation: pulse 1.5s infinite;
+}
+
+.version-badge.error {
+    background: linear-gradient(135deg, #da3633 0%, #f85149 100%);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.version-icon {
+    font-size: 1.1em;
+}
+
+/* GitHub intro-text */
+.github-intro {
+    flex: 1;
+    min-width: 250px;
+    color: #c9d1d9;
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.github-intro strong {
+    color: #58a6ff;
+}
+
+.github-intro a {
+    color: #58a6ff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.github-intro a:hover {
+    color: #79c0ff;
+    text-decoration: underline;
+}
+
+/* Release-datum under versionsbadge */
+.version-date {
+    display: block;
+    font-size: 0.75em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 2px;
+    font-weight: normal;
+}
+
+/* Responsiv anpassning för GitHub-box */
+@media (max-width: 600px) {
+    .github-info-box {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .version-badge {
+        margin-bottom: 10px;
+    }
+    
+    .github-intro {
+        min-width: 100%;
+    }
+}

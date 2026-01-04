@@ -337,6 +337,50 @@ git merge origin/main    # Slå ihop med din lokala branch
 
 ---
 
+### 🌿 Branch-strategi: Varför feature branches?
+
+**Best practice:** Gör ALLTID ändringar på en separat branch, inte direkt på `main`.
+
+```
+main (alltid stabil) ← Pull Request ← Branch_utv3 (utveckling)
+```
+
+| Direkt till main | Via feature branch |
+|------------------|-------------------|
+| ❌ Ingen code review | ✅ Möjlighet till PR och review |
+| ❌ Svårt att ångra | ✅ Lätt att avbryta/ändra |
+| ❌ Kan orsaka problem | ✅ main är alltid stabil |
+| ❌ Ingen dokumentation | ✅ PR dokumenterar ändringen |
+
+**Workflow för detta projekt:**
+
+```bash
+# 1. Skapa och byt till ny branch
+git checkout -b Branch_utv3
+
+# 2. Gör dina ändringar, commita
+git add .
+git commit -m "Beskrivning av ändring"
+
+# 3. Pusha till GitHub
+git push origin Branch_utv3
+
+# 4. Skapa Pull Request på GitHub
+# https://github.com/lundgren9/Twitter/pulls
+
+# 5. Merga till main (via GitHub eller lokalt)
+git checkout main
+git merge Branch_utv3
+git push origin main
+```
+
+**Även för små ändringar?** Ja! Det tar bara några sekunder extra och ger:
+- Historik över varför ändringar gjordes
+- Möjlighet att ångra utan att påverka main
+- Vana vid professionellt arbetsflöde
+
+---
+
 ### 🏷️ Git Tags och Releases
 
 Vi använder **tags** för att markera versioner:
@@ -614,6 +658,12 @@ Detta projekt är öppen källkod. Använd det gärna för egna projekt.
 ---
 
 ## Ändringslogg
+
+### 2026-01-04 - Version 2.0 (fortsättning)
+- 🏷️ Lagt till versionsbadge som hämtar version från GitHub API
+- 📦 Lagt till GitHub-info box med introduktion till Open Source
+- 🌿 Dokumenterat branch-strategi (alltid via feature branch)
+- 📚 Utökad README med Git-illustrationer från ByteByteGo
 
 ### 2026-01-04 - Version 2.0
 - 🖼️ Utökad bildbank från 10 till 16 bilder
