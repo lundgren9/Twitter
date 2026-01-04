@@ -7,9 +7,11 @@ Ett interaktivt bildcollage som visar bilder från Twitter/X med hashtag **#Bjer
 ## 📋 Innehållsförteckning
 
 - [Om projektet](#om-projektet)
+- [Versionshistorik](#versionshistorik)
 - [Funktioner](#funktioner)
 - [Tekniska val](#tekniska-val)
 - [Installation](#installation)
+- [Hur Git fungerar](#hur-git-fungerar)
 - [Användning](#användning)
 - [Lokal lagring utan backend](#lokal-lagring-utan-backend)
 - [Framtida utveckling - X API](#framtida-utveckling---x-api)
@@ -32,6 +34,43 @@ Projektet skapades för att visa bilder från Twitter/X som taggats med **#Bjerr
 
 ---
 
+## Versionshistorik
+
+### 🏷️ Version 2.0 (2026-01-04)
+
+**Release:** [v2.0 på GitHub](https://github.com/lundgren9/Twitter/releases/tag/v2.0)
+
+| Nyhet | Beskrivning |
+|-------|-------------|
+| 🖼️ **16 bilder** | Bildbanken utökad från 10 till 16 bilder |
+| 🔍 **Lightbox** | Klicka på en bild för att se den i fullstorlek |
+| 🔗 **Öppna på X** | Direktlänk till original-tweeten från lightbox |
+| 📅 **Tooltip med datum** | Håll muspekaren över bilder för att se datum |
+| 👤 **Bildmetadata** | Sparar tweet-URL, datum och text för kända bilder |
+
+**Hur version 2.0 skapades:**
+
+```bash
+# 1. Utveckling skedde på branch Branch_utv3
+git checkout -b Branch_utv3
+
+# 2. Efter färdig utveckling: skapa en annoterad tag
+git tag -a v2.0 -m "Version 2.0: Utökad bildbank med 16 bilder, tooltip med datum"
+
+# 3. Pusha taggen till GitHub
+git push origin v2.0
+
+# 4. Skapa Release på GitHub via webgränssnittet
+# https://github.com/lundgren9/Twitter/releases/new
+# Välj taggen v2.0 och fyll i release notes
+```
+
+### 🏷️ Version 1.0 (Release)
+
+Ursprunglig version med grundläggande funktionalitet.
+
+---
+
 ## Funktioner
 
 ### ✅ Nuvarande funktioner
@@ -40,6 +79,9 @@ Projektet skapades för att visa bilder från Twitter/X som taggats med **#Bjerr
 |----------|-------------|
 | 🖼️ **Bildcollage** | 3×3 rutnät med bilder som roterar automatiskt |
 | 🔄 **Automatisk rotation** | En slumpmässig bild byts ut var 4:e sekund |
+| 🔍 **Lightbox** | Klicka på bild för fullstorlek (v2.0) |
+| 🔗 **Öppna på X** | Länk till original-tweet (v2.0) |
+| 📅 **Datum-tooltip** | Visa datum vid hover (v2.0) |
 | 🎬 **Inbäddad video** | Twitter-video visas via oEmbed |
 | ➕ **Lägg till bilder** | Input-ruta för att lägga till egna bild-URLs |
 | 💾 **Lokal lagring** | Användarens bilder sparas i webbläsaren (localStorage) |
@@ -108,6 +150,30 @@ För att visa video från Twitter använder vi **Twitter oEmbed**:
 - Kan blockeras av annonsblockerare
 - Beroende av Twitter's servrar
 
+### Bildmetadata och tweet-information (v2.0)
+
+**Problemet:** När användaren klickar på en bild i lightbox vill vi visa:
+- 📅 Datumet bilden postades
+- ✏️ Texten som skrevs i tweeten
+- 🔗 Länk till original-tweeten
+
+**Utmaningen:** Twitter-bilder har URL:er som `pbs.twimg.com/media/G6SRdvUW0AEJc6G` - dessa innehåller **inget tweet-ID**. Det går alltså inte att automatiskt koppla en bild-URL till sin tweet.
+
+**Lösningen:** Vi skapade ett `imageMetadata`-objekt i JavaScript där vi manuellt mappar bild-URL:er till tweet-information:
+
+```javascript
+const imageMetadata = {
+    'https://pbs.twimg.com/media/GziGQg-WUAAq9GH?format=jpg&name=large': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1961465270280577380',
+        date: '2025-05-10',
+        text: 'Vacker solnedgång vid Bjerreds Saltsjöbad'
+    }
+    // ... fler bilder
+};
+```
+
+För bilder utan känd tweet-URL länkas användaren till profilsidan istället.
+
 ### Input-container för nya bilder
 
 Användare kan lägga till egna bilder genom att klistra in en URL:
@@ -134,7 +200,7 @@ Användare kan lägga till egna bilder genom att klistra in en URL:
 
 ### Steg-för-steg
 
-1. **Klona eller ladda ner repositoryt:**
+1. **Klona repositoryt:**
    ```bash
    git clone https://github.com/lundgren9/Twitter.git
    ```
@@ -157,11 +223,204 @@ Användare kan lägga till egna bilder genom att klistra in en URL:
 
 ---
 
+## Hur Git fungerar
+
+### 📚 Varför `git clone` och inte `git pull`?
+
+I installationsinstruktionerna ovan används `git clone` för att hämta projektet. Men varför inte `git pull`? Här förklaras skillnaden:
+
+#### `git clone` - Skapa en ny lokal kopia
+
+```bash
+git clone https://github.com/lundgren9/Twitter.git
+```
+
+**Vad händer:**
+1. 📁 Skapar en ny mapp (`Twitter/`)
+2. 📥 Laddar ner **hela repositoryt** från GitHub
+3. 🔗 Sätter upp koppling till remote (`origin`)
+4. 📋 Kopierar all historik (alla commits, branches, tags)
+
+**Används när:** Du **inte har** projektet lokalt och vill börja från scratch.
+
+#### `git pull` - Uppdatera befintligt repo
+
+```bash
+git pull origin main
+```
+
+**Vad händer:**
+1. 📥 Hämtar nya ändringar från remote (`git fetch`)
+2. 🔀 Slår ihop ändringarna med din lokala branch (`git merge`)
+
+**Används när:** Du **redan har** projektet lokalt och vill få de senaste uppdateringarna.
+
+#### ⚠️ Varför `git pull` inte fungerar utan `git clone` först
+
+```bash
+# ❌ Detta fungerar INTE om du inte har ett repo:
+cd tom_mapp
+git pull https://github.com/lundgren9/Twitter.git
+
+# Fel: fatal: not a git repository
+```
+
+`git pull` kräver att du redan befinner dig i ett Git-repository. Utan ett existerande `.git`-mapp vet Git inte:
+- Vilken branch du är på
+- Vad som ska mergas
+- Var historiken finns
+
+#### 📊 Sammanfattning
+
+| Scenario | Kommando |
+|----------|----------|
+| Första gången - hämta projektet | `git clone` |
+| Redan har projektet - hämta uppdateringar | `git pull` |
+| Se vad som ändrats på remote (utan merge) | `git fetch` |
+
+---
+
+### 🖼️ How Git Actually Works
+
+Följande illustrationer förklarar hur Git fungerar internt. 
+
+**Källa:** [ByteByteGo](https://www.youtube.com/@ByteByteGo/videos) - [How Git Actually Works](https://youtu.be/e9lnsKot_SQ?si=D927M2hXnkpOvig5)
+
+#### Git's arkitektur
+
+![How Git Actually Works](How_Git_Actually_Works.jpg)
+
+*Bilden visar Git's fyra huvudområden: Working Directory, Staging Area, Local Repository och Remote Repository.*
+
+**Förklaring:**
+- **Working Directory** - Din lokala mapp med filerna du arbetar med
+- **Staging Area (Index)** - "Förberedelseområdet" där du väljer vilka ändringar som ska committas
+- **Local Repository** - Din lokala Git-historik (`.git`-mappen)
+- **Remote Repository** - GitHub/GitLab/etc. - den centrala servern
+
+---
+
+#### Git Checkout, Get & Switch
+
+![Git Checkout, Get & Switch](git_checkout_get_switch.jpg)
+
+*Bilden visar hur `git checkout`, `git switch` och `git restore` fungerar.*
+
+**Moderna Git-kommandon (rekommenderade):**
+- `git switch <branch>` - Byt branch
+- `git restore <file>` - Återställ fil från senaste commit
+
+**Äldre kommando (fortfarande fungerar):**
+- `git checkout` - Gör båda sakerna (kan vara förvirrande)
+
+---
+
+#### Git Pull = Git Fetch + Git Merge
+
+![Git Pull = Git Fetch + Git Merge](git_pull_lika_med_git_fetch_och_git_merge.jpg)
+
+*Bilden visar att `git pull` egentligen är två operationer i ett.*
+
+**Förklaring:**
+
+```bash
+git pull origin main
+# Är samma sak som:
+git fetch origin main    # Hämta ändringar (utan att ändra dina filer)
+git merge origin/main    # Slå ihop med din lokala branch
+```
+
+**Varför är detta viktigt?**
+- `git fetch` är "säkert" - det ändrar aldrig dina lokala filer
+- `git merge` kan orsaka **merge conflicts** om du och andra ändrat samma filer
+- Med `git fetch` först kan du **inspektera** ändringarna innan du mergar
+
+---
+
+### 🌿 Branch-strategi: Varför feature branches?
+
+**Best practice:** Gör ALLTID ändringar på en separat branch, inte direkt på `main`.
+
+```
+main (alltid stabil) ← Pull Request ← Branch_utv3 (utveckling)
+```
+
+| Direkt till main | Via feature branch |
+|------------------|-------------------|
+| ❌ Ingen code review | ✅ Möjlighet till PR och review |
+| ❌ Svårt att ångra | ✅ Lätt att avbryta/ändra |
+| ❌ Kan orsaka problem | ✅ main är alltid stabil |
+| ❌ Ingen dokumentation | ✅ PR dokumenterar ändringen |
+
+**Workflow för detta projekt:**
+
+```bash
+# 1. Skapa och byt till ny branch
+git checkout -b Branch_utv3
+
+# 2. Gör dina ändringar, commita
+git add .
+git commit -m "Beskrivning av ändring"
+
+# 3. Pusha till GitHub
+git push origin Branch_utv3
+
+# 4. Skapa Pull Request på GitHub
+# https://github.com/lundgren9/Twitter/pulls
+
+# 5. Merga till main (via GitHub eller lokalt)
+git checkout main
+git merge Branch_utv3
+git push origin main
+```
+
+**Även för små ändringar?** Ja! Det tar bara några sekunder extra och ger:
+- Historik över varför ändringar gjordes
+- Möjlighet att ångra utan att påverka main
+- Vana vid professionellt arbetsflöde
+
+---
+
+### 🏷️ Git Tags och Releases
+
+Vi använder **tags** för att markera versioner:
+
+```bash
+# Visa alla tags
+git tag
+
+# Skapa en annoterad tag
+git tag -a v2.0 -m "Version 2.0: Beskrivning"
+
+# Pusha tag till GitHub
+git push origin v2.0
+
+# Pusha ALLA tags
+git push origin --tags
+```
+
+**Skillnad mellan tag och branch:**
+
+| Egenskap | Tag | Branch |
+|----------|-----|--------|
+| Syfte | Markera en specifik version | Utvecklingsgren |
+| Flyttbar | ❌ Nej, pekar alltid på samma commit | ✅ Ja, flyttas vid nya commits |
+| Användning | Releases, versioner | Feature-utveckling, bugfixar |
+
+---
+
 ## Användning
 
 ### Visa bildcollaget
 
 Öppna `index.html` i en webbläsare. Bilderna börjar rotera automatiskt.
+
+### Klicka på bilder (v2.0)
+
+1. Klicka på valfri bild i collaget
+2. Bilden öppnas i **lightbox** (fullskärmsläge)
+3. Klicka **"Öppna på X"** för att se original-tweeten
+4. Klicka utanför bilden eller på **×** för att stänga
 
 ### Lägga till egna bilder
 
@@ -316,19 +575,22 @@ async function fetchImagesFromAPI() {
 
 ```
 Twitterbilder/
-├── index.html      # Huvudsida med HTML-struktur
-├── styles.css      # All CSS-styling
-├── javaScript.js   # All JavaScript-logik
-└── README.md       # Denna fil
+├── index.html                                    # Huvudsida med HTML-struktur
+├── styles.css                                    # All CSS-styling
+├── javaScript.js                                 # All JavaScript-logik
+├── README.md                                     # Denna fil
+├── How_Git_Actually_Works.jpg                    # Git-illustration (ByteByteGo)
+├── git_checkout_get_switch.jpg                   # Git-illustration (ByteByteGo)
+└── git_pull_lika_med_git_fetch_och_git_merge.jpg # Git-illustration (ByteByteGo)
 ```
 
 ### Filbeskrivning
 
 | Fil | Storlek | Beskrivning |
 |-----|---------|-------------|
-| `index.html` | ~12 KB | HTML-struktur, video-embed, modal |
-| `styles.css` | ~18 KB | Responsiv CSS, animationer, grid |
-| `javaScript.js` | ~15 KB | Bildrotation, localStorage, DOM-hantering |
+| `index.html` | ~12 KB | HTML-struktur, video-embed, modal, lightbox |
+| `styles.css` | ~20 KB | Responsiv CSS, animationer, grid, lightbox |
+| `javaScript.js` | ~18 KB | Bildrotation, localStorage, DOM, lightbox |
 
 ---
 
@@ -364,6 +626,23 @@ clearUserImages()   // Radera alla egna bilder
 
 ---
 
+## Bildkällor och attribution
+
+### Git-illustrationer
+
+De tre Git-illustrationerna i detta projekt kommer från **ByteByteGo**:
+
+- 📺 **YouTube-kanal:** [ByteByteGo](https://www.youtube.com/@ByteByteGo/videos)
+- 🎬 **Video:** [How Git Actually Works](https://youtu.be/e9lnsKot_SQ?si=D927M2hXnkpOvig5)
+
+ByteByteGo skapar utmärkta visuella förklaringar av komplexa tekniska koncept.
+
+### Twitter-bilder
+
+Alla bilder i collaget kommer från tweets med hashtag **#Bjerredssaltsjobad** på X/Twitter.
+
+---
+
 ## Licens
 
 Detta projekt är öppen källkod. Använd det gärna för egna projekt.
@@ -380,7 +659,22 @@ Detta projekt är öppen källkod. Använd det gärna för egna projekt.
 
 ## Ändringslogg
 
-### 2026-01-03
+### 2026-01-04 - Version 2.0 (fortsättning)
+- 🏷️ Lagt till versionsbadge som hämtar version från GitHub API
+- 📦 Lagt till GitHub-info box med introduktion till Open Source
+- 🌿 Dokumenterat branch-strategi (alltid via feature branch)
+- 📚 Utökad README med Git-illustrationer från ByteByteGo
+
+### 2026-01-04 - Version 2.0
+- 🖼️ Utökad bildbank från 10 till 16 bilder
+- 🔍 Lightbox-funktionalitet för fullskärmsvisning
+- 🔗 "Öppna på X" för att se original-tweet
+- 📅 Tooltip med datum vid hover
+- 🏷️ Skapat Git tag `v2.0` och GitHub Release
+- 📚 Uppdaterad README med Git-dokumentation
+- 🎨 Git-illustrationer från ByteByteGo
+
+### 2026-01-03 - Version 1.0
 - ➕ Lagt till 10 Twitter-bilder från #Bjerredssaltsjobad
 - ➕ Lagt till inbäddad video via Twitter oEmbed
 - ➕ Lagt till input-ruta för att lägga till bilder
