@@ -2,6 +2,25 @@
 <!-- 
     BJERREDS SALTSJÖBAD - BILDCOLLAGE
     =================================
+    
+    ╔════════════════════════════════════════════════════════════════════╗
+    ║  VIKTIGT: CHECKLISTA VID NY VERSION                                ║
+    ╠════════════════════════════════════════════════════════════════════╣
+    ║  1. Utveckla i "utveckling" branch (ALDRIG direkt i main!)         ║
+    ║  2. Commita och pusha till GitHub                                  ║
+    ║  3. Skapa Pull Request och merga till main                         ║
+    ║  4. Skapa tag: git tag -a vX.X -m "Version X.X: Beskrivning"       ║
+    ║  5. Pusha tag: git push origin vX.X                                ║
+    ║  6. SKAPA BACKUP-MAPP: mkdir vX.X                                  ║
+    ║     → git show vX.X:index.html | Out-File -Encoding utf8 vX.X/...  ║
+    ║     → Gör samma för styles.css och javaScript.js                   ║
+    ║  7. Commita och pusha backup-mappen                                ║
+    ║  8. Skapa Release på GitHub                                        ║
+    ║                                                                    ║
+    ║  OBS! Skapa ALLTID backup-mapp (vX.X/) samtidigt som ny version!   ║
+    ║  Detta gör det lätt att länka till och visa historiska versioner.  ║
+    ╚════════════════════════════════════════════════════════════════════╝
+    
     UPPDATERING 2026-01-03 (v1.0):
     - Ändrat CSS och JS-länkar till relativa sökvägar
     - Lagt till video-sektion med inbäddad Twitter-video
@@ -20,11 +39,18 @@
     - Lagt till versionsbadge som hämtar senaste version från GitHub API
     - Visar versionsnummer och release-datum automatiskt
     
-    UPPDATERING 2026-01-04 (v2.4 - förberedelse):
+    UPPDATERING 2026-01-04 (v2.4):
     - Lagt till versioner.html med komplett Git/GitHub dokumentation
     - Lagt till "Versioner & Git-guide" knapp
-    - Skapat versionsmappar /v1.0/ och /v2.0/ för historiska versioner
+    - Skapat versionsmappar /v1.0/, /v2.0/ och /v2.2/ för historiska versioner
     - Dokumenterat GitHub Pages och hur versioner hanteras
+    
+    UPPDATERING 2026-01-04 (v2.5):
+    - Skapat GitHub Wiki med 9 dokumentationssidor
+    - Wiki-sidor: Home, Bildhantering, localStorage, X API, Git Grunderna,
+      Arbetsflöde med branches, Tags och Releases, GitHub Pages, Lightbox
+    - Följt nytt arbetsflöde: utveckling branch → PR → merge → tag
+    - BACKUP-MAPP: /v2.5/ skapad efter merge
 -->
 <html lang="sv">
 <head>
