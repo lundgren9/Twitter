@@ -1,5 +1,16 @@
 # 🏠 Bjerreds Saltsjöbad - Wiki
 
+---
+
+## 🔙 Navigation
+
+| 🚀 | 📦 | 📚 |
+|:---:|:---:|:---:|
+| **[▶️ KÖR PROGRAMMET](https://lundgren9.github.io/Twitter/)** | **[📁 GitHub Repository](https://github.com/lundgren9/Twitter)** | **[📋 Releases](https://github.com/lundgren9/Twitter/releases)** |
+| Live demo | Källkod | Versioner |
+
+---
+
 Välkommen till **dokumentationen** för projektet Bjerreds Saltsjöbad Bildcollage!
 
 Denna Wiki innehåller **9 sidor** med detaljerad information om både programmet och de tekniker som används.
