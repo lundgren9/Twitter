@@ -10,6 +10,8 @@
    5. Input-ruta för att lägga till egna bilder
    6. localStorage för att spara användarens bilder
    7. Visning av aktuella bilder och "stack" (väntande bilder)
+   8. Lightbox för att visa bilder i full storlek
+   9. Tooltip med datum vid hover
    
    UPPDATERING 2026-01-03:
    - Ersatt Unsplash-bilder med riktiga Twitter-bilder
@@ -17,13 +19,21 @@
    - Lagt till localStorage för att spara bilder
    - Lagt till visning av bildstack
    
+   UPPDATERING 2026-01-04 (Issue #2):
+   - Utökat från 10 till 16 bilder
+   - Lagt till metadata (datum, tweet-URL) för 7 bilder
+   - Tooltip vid hover visar bildens datum
+   - refs https://github.com/lundgren9/Twitter/issues/2
+   
    ============================================ */
 
 // === 1. GLOBALA VARIABLER ===
 
-// UPPDATERING 2026-01-03: Riktiga bilder från Twitter/X med hashtag #Bjerredssaltsjobad
-// Dessa bilder kommer från @kentlundgren på X
+// UPPDATERING 2026-01-04: Utökad bildbank med 16 bilder från Twitter/X
+// Dessa bilder kommer från @kentlundgren på X med hashtag #Bjerredssaltsjobad
+// Issue #2: https://github.com/lundgren9/Twitter/issues/2
 const defaultImages = [
+    // Ursprungliga bilder
     'https://pbs.twimg.com/media/G6SRdvUW0AEJc6G?format=jpg&name=large',
     'https://pbs.twimg.com/media/G6SRdxlWsAAPoIi?format=jpg&name=large',
     'https://pbs.twimg.com/media/G6SeZh_X0AAVPdc?format=jpg&name=large',
@@ -33,19 +43,57 @@ const defaultImages = [
     'https://pbs.twimg.com/media/G0GQS82W0AA_uyb?format=jpg&name=large',
     'https://pbs.twimg.com/media/Gmvpf-GW4AApxnI?format=jpg&name=large',
     'https://pbs.twimg.com/media/Gqc3dWeXAAAwFqD?format=jpg&name=large',
-    'https://pbs.twimg.com/media/GXISy3rWEAEc1-y?format=jpg&name=large'
+    'https://pbs.twimg.com/media/GXISy3rWEAEc1-y?format=jpg&name=large',
+    // UPPDATERING 2026-01-04: Nya bilder tillagda enligt Issue #2
+    'https://pbs.twimg.com/media/G6SRdvLXgAIP5cm?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G90MSGoXUAAZ82E?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G7abtnfW8AAYksn?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G7abtlqWwAE8LeS?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GgJNp2wXMAAUUml?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GJSzLV4W4AADykr?format=jpg&name=large'
 ];
 
-// UPPDATERING 2026-01-03: Metadata för bilder där vi känner till tweet-URL
+// UPPDATERING 2026-01-04: Metadata för bilder med tweet-URL och datum
 // Nyckel = bild-ID (från URL), Värde = { tweetUrl, date, text }
-// OBS: Det är svårt att få fram denna data för alla bilder, se Teknisk Dokumentation
+// Datum visas vid hover över bilden
 const imageMetadata = {
+    // Befintlig bild med uppdaterad metadata
     'GziGQg-WUAAq9GH': {
         tweetUrl: 'https://x.com/kentlundgren/status/1961465270280577380',
-        date: null,  // Okänt datum
-        text: null   // Okänd text
+        date: '2025-08-29',
+        text: null
+    },
+    // NYA bilder tillagda 2026-01-04 (Issue #2)
+    'G6SRdvLXgAIP5cm': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1991876902991343647/photo/2',
+        date: '2025-11-21',
+        text: null
+    },
+    'G90MSGoXUAAZ82E': {
+        tweetUrl: 'https://x.com/kentlundgren/status/2007774516928500166/photo/1',
+        date: 'år 2025 sista dag: 2025-12-31',
+        text: null
+    },
+    'G7abtnfW8AAYksn': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1996954701070307374/photo/2',
+        date: 'Blått 25-12-05',
+        text: null
+    },
+    'G7abtlqWwAE8LeS': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1996954701070307374/photo/1',
+        date: 'Stol 25-12-05',
+        text: null
+    },
+    'GgJNp2wXMAAUUml': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1874145779319013598/photo/1',
+        date: 'Håkan och Lotta 24-12-31',
+        text: null
+    },
+    'GJSzLV4W4AADykr': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1771237567175790644/photo/1',
+        date: '24-03-22',
+        text: null
     }
-    // Lägg till fler bilder här om du får tag på deras tweet-URLs
 };
 
 // Bildpool som innehåller alla bilder (standard + användarens egna)
@@ -178,6 +226,9 @@ function loadInitialImages() {
         // Sätt bildkällan
         imgElement.src = imageUrl;
         
+        // UPPDATERING 2026-01-04: Sätt tooltip med datum vid hover
+        setImageTooltip(imgElement, imageUrl);
+        
         // Lägg till event listener som lägger till 'loaded' class när bilden laddats
         // Detta triggar fade-in animation via CSS
         imgElement.addEventListener('load', function() {
@@ -194,6 +245,25 @@ function loadInitialImages() {
     
     // UPPDATERING 2026-01-03: Uppdatera bildlistorna
     updateImageLists();
+}
+
+/**
+ * UPPDATERING 2026-01-04: Sätter tooltip (title) för en bild baserat på metadata
+ * @param {HTMLElement} imgElement - Bildelementet
+ * @param {string} imageUrl - Bildens URL
+ */
+function setImageTooltip(imgElement, imageUrl) {
+    const imageId = extractImageId(imageUrl);
+    const metadata = imageMetadata[imageId];
+    
+    if (metadata && metadata.date) {
+        // Visa datum vid hover
+        imgElement.title = metadata.date;
+        imgElement.parentElement.title = metadata.date; // Sätt även på container
+    } else {
+        imgElement.title = 'Klicka för att se i full storlek';
+        imgElement.parentElement.title = 'Klicka för att se i full storlek';
+    }
 }
 
 /**
@@ -256,6 +326,9 @@ function rotateRandomImage() {
         
         // Sätt ny bildkälla
         imgElement.src = newImageUrl;
+        
+        // UPPDATERING 2026-01-04: Uppdatera tooltip med datum
+        setImageTooltip(imgElement, newImageUrl);
         
         // När bilden laddats, lägg tillbaka 'loaded' class för fade-in
         imgElement.addEventListener('load', function onLoad() {
