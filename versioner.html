@@ -707,6 +707,225 @@
         </section>
 
         <!-- ============================================ -->
+        <!-- SEKTION: VARFÖR ALLTID ARBETA I EN UTVECKLINGSBRANCH -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🌿 Varför alltid arbeta i en utvecklingsbranch?</h2>
+            
+            <div class="warning-box">
+                <h4>⚠️ Lärdom från detta projekt</h4>
+                <p>Version 2.4 av detta projekt skapades genom att arbeta <strong>direkt i main-branchen</strong>. Detta är <strong>inte rekommenderat</strong> eftersom:</p>
+                <ul style="color: #744210;">
+                    <li>Man kan inte testa ändringarna separat innan de publiceras</li>
+                    <li>Man missar möjligheten att använda Pull Requests för dokumentation</li>
+                    <li>Om något går fel påverkas produktionsversionen direkt</li>
+                    <li>Andra utvecklare kan inte granska koden innan den mergas</li>
+                </ul>
+            </div>
+            
+            <h3>Best Practice: Feature Branch Workflow</h3>
+            <p>Använd <strong>alltid</strong> en separat branch för utveckling, även för små ändringar:</p>
+            
+            <div class="git-command">
+                <code><span class="comment"># 1. Skapa och byt till utvecklingsbranch</span></code><br>
+                <code>git checkout -b utveckling</code><br>
+                <code><span class="comment"># eller med nya kommandot:</span></code><br>
+                <code>git switch -c utveckling</code><br><br>
+                <code><span class="comment"># 2. Gör dina ändringar, testa lokalt</span></code><br>
+                <code>git add .</code><br>
+                <code>git commit -m "Beskrivning av ändring"</code><br><br>
+                <code><span class="comment"># 3. Pusha utvecklingsbranchen till GitHub</span></code><br>
+                <code>git push origin utveckling</code><br><br>
+                <code><span class="comment"># 4. Skapa Pull Request på GitHub</span></code><br>
+                <code><span class="comment"># (gå till github.com/repo/pulls)</span></code><br><br>
+                <code><span class="comment"># 5. Efter review och godkännande: merga till main</span></code><br>
+                <code>git checkout main</code><br>
+                <code>git merge utveckling</code><br>
+                <code>git push origin main</code>
+            </div>
+            
+            <h3>Hur undvika att av misstag arbeta i main?</h3>
+            
+            <div class="highlight-box">
+                <h4>💡 Tips för att skydda main-branchen</h4>
+                <ol>
+                    <li><strong>Kolla alltid vilken branch du är på:</strong>
+                        <div class="git-command" style="margin: 10px 0;">
+                            <code>git branch</code><br>
+                            <code><span class="comment"># Visar alla branches, * markerar aktuell</span></code>
+                        </div>
+                    </li>
+                    <li><strong>Skapa utvecklingsbranch FÖRST, innan du börjar koda</strong></li>
+                    <li><strong>På GitHub: Aktivera "Branch protection rules"</strong>
+                        <ul>
+                            <li>Gå till Settings → Branches → Add rule</li>
+                            <li>Kräv Pull Request före merge till main</li>
+                            <li>Kräv minst en godkännande review</li>
+                        </ul>
+                    </li>
+                    <li><strong>Visa branch-namn i terminalen (PowerShell):</strong>
+                        <div class="git-command" style="margin: 10px 0;">
+                            <code><span class="comment"># Installera posh-git för att visa branch i prompten</span></code><br>
+                            <code>Install-Module posh-git -Scope CurrentUser</code><br>
+                            <code>Import-Module posh-git</code>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            
+            <h3>Jämförelse: Direkt i main vs Feature Branch</h3>
+            <table class="method-table">
+                <thead>
+                    <tr>
+                        <th>Aspekt</th>
+                        <th>Direkt i main ❌</th>
+                        <th>Feature branch ✅</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Testa innan publicering</td>
+                        <td>Nej, ändringar syns direkt</td>
+                        <td>Ja, kan testa i separat branch</td>
+                    </tr>
+                    <tr>
+                        <td>Ångra ändringar</td>
+                        <td>Svårt, måste göra ny commit</td>
+                        <td>Lätt, bara ta bort branchen</td>
+                    </tr>
+                    <tr>
+                        <td>Code review</td>
+                        <td>Inte möjligt</td>
+                        <td>Via Pull Request</td>
+                    </tr>
+                    <tr>
+                        <td>Dokumentation</td>
+                        <td>Endast commit-meddelande</td>
+                        <td>PR-beskrivning + diskussion</td>
+                    </tr>
+                    <tr>
+                        <td>Samarbete</td>
+                        <td>Risk för konflikter</td>
+                        <td>Isolerade ändringar</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- SEKTION: TECKENKODNING (UTF-8) -->
+        <!-- ============================================ -->
+        <section class="section-box">
+            <h2>🔤 Teckenkodning: Varför å, ä, ö blev fel</h2>
+            
+            <div class="warning-box">
+                <h4>⚠️ Problem i äldre versioner</h4>
+                <p>I versionsmapparna (v1.0, v2.0, v2.2) visades svenska tecken som <code>Ã¥</code>, <code>Ã¤</code>, <code>Ã¶</code> istället för å, ä, ö.</p>
+                <p><strong>Orsak:</strong> PowerShells omdirigering (<code>></code>) använder inte UTF-8 som standard på Windows.</p>
+            </div>
+            
+            <h3>Vad är teckenkodning?</h3>
+            <p>Datorer lagrar text som siffror. <strong>Teckenkodning</strong> bestämmer hur siffror översätts till bokstäver:</p>
+            
+            <table class="method-table">
+                <thead>
+                    <tr>
+                        <th>Kodning</th>
+                        <th>Tecken som stöds</th>
+                        <th>Användning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ASCII</strong></td>
+                        <td>A-Z, a-z, 0-9 (128 tecken)</td>
+                        <td>Gammal standard, endast engelska</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Latin-1 (ISO-8859-1)</strong></td>
+                        <td>+ å, ä, ö, é, etc.</td>
+                        <td>Västeuropeiska språk</td>
+                    </tr>
+                    <tr>
+                        <td><strong>UTF-8</strong> ✅</td>
+                        <td>Alla världens tecken + emojis</td>
+                        <td>Modern standard, webben</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Varför blev det fel?</h3>
+            <div class="git-command">
+                <code><span class="comment"># Detta kommando FEL i PowerShell:</span></code><br>
+                <code>git show v2.0:index.html > v2.0/index.html</code><br><br>
+                <code><span class="comment"># PowerShell använder Windows-1252 (ej UTF-8)</span></code><br>
+                <code><span class="comment"># Resultatet: å → Ã¥, ä → Ã¤, ö → Ã¶</span></code>
+            </div>
+            
+            <h3>Korrekt lösning för PowerShell</h3>
+            <div class="git-command">
+                <code><span class="comment"># Metod 1: Använd Out-File med UTF-8</span></code><br>
+                <code>git show v2.0:index.html | Out-File -Encoding utf8 -FilePath v2.0/index.html</code><br><br>
+                <code><span class="comment"># Metod 2: Sätt UTF-8 som standard först</span></code><br>
+                <code>$OutputEncoding = [System.Text.Encoding]::UTF8</code><br>
+                <code>[Console]::OutputEncoding = [System.Text.Encoding]::UTF8</code><br>
+                <code>git show v2.0:index.html > v2.0/index.html</code>
+            </div>
+            
+            <h3>Förebyggande åtgärder</h3>
+            <div class="success-box">
+                <h4>✅ Så undviker du teckenkodningsproblem</h4>
+                <ol>
+                    <li><strong>Spara alltid filer som UTF-8</strong> i din editor (VS Code, Cursor, etc.)</li>
+                    <li><strong>Deklarera teckenkodning i HTML:</strong>
+                        <div class="git-command" style="margin: 10px 0;">
+                            <code>&lt;meta charset="UTF-8"&gt;</code>
+                        </div>
+                    </li>
+                    <li><strong>I PowerShell, använd Out-File med -Encoding utf8</strong></li>
+                    <li><strong>Kontrollera att .gitattributes har:</strong>
+                        <div class="git-command" style="margin: 10px 0;">
+                            <code>* text=auto eol=lf</code><br>
+                            <code>*.html text eol=lf</code><br>
+                            <code>*.css text eol=lf</code><br>
+                            <code>*.js text eol=lf</code>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            
+            <h3>Teknisk förklaring</h3>
+            <p>När en UTF-8-fil läses med fel kodning händer detta:</p>
+            <table class="method-table">
+                <thead>
+                    <tr>
+                        <th>Tecken</th>
+                        <th>UTF-8 bytes (hex)</th>
+                        <th>Tolkat som Windows-1252</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>å</strong></td>
+                        <td>C3 A5</td>
+                        <td>Ã¥</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ä</strong></td>
+                        <td>C3 A4</td>
+                        <td>Ã¤</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ö</strong></td>
+                        <td>C3 B6</td>
+                        <td>Ã¶</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>UTF-8 använder <strong>två bytes</strong> för å, ä, ö. Windows-1252 tolkar varje byte separat, vilket ger "Mojibake" (förvrängd text).</p>
+        </section>
+
+        <!-- ============================================ -->
         <!-- SEKTION 3: GIT CHECKOUT VS GIT SWITCH -->
         <!-- ============================================ -->
         <section class="section-box">
