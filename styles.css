@@ -1011,3 +1011,17 @@ header h1 {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(137, 87, 229, 0.4);
 }
+
+/* UPPDATERING 2026-01-04 (v2.5): Wiki-knapp */
+.wiki-button {
+    background: linear-gradient(135deg, #0366d6 0%, #2188ff 100%) !important;
+    border-color: #0366d6 !important;
+    text-decoration: none;
+}
+
+.wiki-button:hover {
+    background: linear-gradient(135deg, #2188ff 0%, #58a6ff 100%) !important;
+    border-color: #2188ff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(3, 102, 214, 0.4);
+}
