@@ -1,0 +1,422 @@
+﻿<!DOCTYPE html>
+<!-- 
+    BJERREDS SALTSJ├ûBAD - BILDCOLLAGE
+    =================================
+    
+    ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+    Ôòæ  VIKTIGT: CHECKLISTA VID NY VERSION                                Ôòæ
+    ÔòáÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòú
+    Ôòæ  1. Utveckla i "utveckling" branch (ALDRIG direkt i main!)         Ôòæ
+    Ôòæ  2. Commita och pusha till GitHub                                  Ôòæ
+    Ôòæ  3. Skapa Pull Request och merga till main                         Ôòæ
+    Ôòæ  4. Skapa tag: git tag -a vX.X -m "Version X.X: Beskrivning"       Ôòæ
+    Ôòæ  5. Pusha tag: git push origin vX.X                                Ôòæ
+    Ôòæ  6. SKAPA BACKUP-MAPP: mkdir vX.X                                  Ôòæ
+    Ôòæ     ÔåÆ git show vX.X:index.html | Out-File -Encoding utf8 vX.X/...  Ôòæ
+    Ôòæ     ÔåÆ G├Âr samma f├Âr styles.css och javaScript.js                   Ôòæ
+    Ôòæ  7. Commita och pusha backup-mappen                                Ôòæ
+    Ôòæ  8. Skapa Release p├Ñ GitHub                                        Ôòæ
+    Ôòæ                                                                    Ôòæ
+    Ôòæ  OBS! Skapa ALLTID backup-mapp (vX.X/) samtidigt som ny version!   Ôòæ
+    Ôòæ  Detta g├Âr det l├ñtt att l├ñnka till och visa historiska versioner.  Ôòæ
+    ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+    
+    UPPDATERING 2026-01-03 (v1.0):
+    - ├ändrat CSS och JS-l├ñnkar till relativa s├Âkv├ñgar
+    - Lagt till video-sektion med inb├ñddad Twitter-video
+    - Lagt till input-ruta f├Âr att l├ñgga till egna bilder
+    - Lagt till visning av aktuella bilder och v├ñntande bilder (stack)
+    - Uppdaterat teknisk dokumentation
+    
+    UPPDATERING 2026-01-04 (v2.0):
+    - Ut├Âkat fr├Ñn 10 till 16 bilder
+    - Lagt till metadata (datum, tweet-URL) f├Âr 7 bilder
+    - Tooltip vid hover visar bildens datum
+    - Inledande text som beskriver collaget
+    
+    UPPDATERING 2026-01-04 (v2.2):
+    - Lagt till GitHub-info box med kort introduktion
+    - Lagt till versionsbadge som h├ñmtar senaste version fr├Ñn GitHub API
+    - Visar versionsnummer och release-datum automatiskt
+    
+    UPPDATERING 2026-01-04 (v2.4):
+    - Lagt till versioner.html med komplett Git/GitHub dokumentation
+    - Lagt till "Versioner & Git-guide" knapp
+    - Skapat versionsmappar /v1.0/, /v2.0/ och /v2.2/ f├Âr historiska versioner
+    - Dokumenterat GitHub Pages och hur versioner hanteras
+    
+    UPPDATERING 2026-01-04 (v2.5):
+    - Skapat GitHub Wiki med 9 dokumentationssidor
+    - Wiki-sidor: Home, Bildhantering, localStorage, X API, Git Grunderna,
+      Arbetsfl├Âde med branches, Tags och Releases, GitHub Pages, Lightbox
+    - F├Âljt nytt arbetsfl├Âde: utveckling branch ÔåÆ PR ÔåÆ merge ÔåÆ tag
+    - BACKUP-MAPP: /v2.5/ skapad efter merge
+-->
+<html lang="sv">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bjerreds Saltsj├Âbad - Bildcollage</title>
+    <!-- L├ñnk till extern CSS-fil f├Âr styling -->
+    <!-- UPPDATERING 2026-01-03: ├ändrad fr├Ñn felaktig absolut s├Âkv├ñg till relativ s├Âkv├ñg -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Huvudcontainer f├Âr hela sidan -->
+    <div class="container">
+        
+        <!-- Sidhuvud med titel och information -->
+        <header>
+            <h1>Bjerreds Saltsj├Âbad</h1>
+            <p class="subtitle">Bilder fr├Ñn #Bjerredssaltsjobad</p>
+            <!-- L├ñnk till Kent Lundgrens X-konto som k├ñlla -->
+            <p class="source">K├ñlla: <a href="https://x.com/search?q=%23Bjerredssaltsjobad%20(from%3Akentlundgren)&src=typed_query&f=top" target="_blank" rel="noopener noreferrer">@kentlundgren p├Ñ X</a></p>
+        </header>
+
+        <!-- UPPDATERING 2026-01-04: Inledande beskrivning av bildcollaget -->
+        <!-- UPPDATERING 2026-01-04: Lagt till GitHub-info och versionsnummer -->
+        <div class="github-info-box">
+            <div class="version-badge" id="versionBadge" title="Laddar version...">
+                <span class="version-icon">­ƒÅÀ´©Å</span>
+                <span id="versionText">Laddar...</span>
+            </div>
+            <p class="github-intro">
+                <strong>Open Source p├Ñ GitHub</strong> ÔÇö Detta program ├ñr ├Âppen k├ñllkod och finns p├Ñ 
+                <a href="https://github.com/lundgren9/Twitter" target="_blank" rel="noopener noreferrer">GitHub</a>. 
+                D├ñr kan du ladda ner koden, l├ñsa dokumentation, och se hur programmet utvecklats. 
+                Git och GitHub g├Âr det m├Âjligt att dela kod, samarbeta och hantera olika versioner p├Ñ ett kontrollerat s├ñtt.
+                <a href="https://github.com/lundgren9/Twitter#readme" target="_blank" rel="noopener noreferrer">L├ñs mer i README ÔåÆ</a>
+            </p>
+        </div>
+
+        <p class="intro-text">
+            H├ñr presenteras <strong>nio (9) bilder</strong> v├ñxelvis, av totalt <strong>16 bilder</strong>. 
+            Bilderna byts ut automatiskt var 4:e sekund. 
+            <em>H├Ñll muspekaren ├Âver en bild f├Âr att se datum.</em>
+        </p>
+
+        <!-- Rutn├ñt f├Âr bildcollage - 3x3 bilder -->
+        <div class="image-grid" id="imageGrid">
+            <!-- 9 bildplatser som fylls dynamiskt via JavaScript -->
+            <!-- Varje img-element har en alt-text f├Âr tillg├ñnglighet -->
+            <!-- UPPDATERING 2026-01-03: Tog bort felaktiga src-s├Âkv├ñgar. JavaScript fyller i dessa dynamiskt. -->
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 1" id="img1"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 2" id="img2"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 3" id="img3"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 4" id="img4"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 5" id="img5"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 6" id="img6"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 7" id="img7"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 8" id="img8"></div>
+            <div class="image-slot"><img src="" alt="Bjerreds Saltsj├Âbad bild 9" id="img9"></div>
+        </div>
+
+        <!-- UPPDATERING 2026-01-03: Video-sektion med inb├ñddad Twitter-video -->
+        <section class="video-section">
+            <h2>­ƒÄ¼ Video fr├Ñn Bjerreds Saltsj├Âbad</h2>
+            <div class="video-container">
+                <!-- Twitter oEmbed - videon laddas via Twitter's widget.js -->
+                <blockquote class="twitter-tweet" data-media-max-width="560">
+                    <a href="https://twitter.com/kentlundgren/status/1991876902991343647"></a>
+                </blockquote>
+            </div>
+            <p class="video-note">Videon laddas fr├Ñn X/Twitter. Om den inte visas, 
+                <a href="https://x.com/kentlundgren/status/1991876902991343647" target="_blank">klicka h├ñr f├Âr att se den p├Ñ X</a>.
+            </p>
+        </section>
+
+        <!-- UPPDATERING 2026-01-03: Input-sektion f├Âr att l├ñgga till egna bilder -->
+        <section class="add-image-section">
+            <h2>Ô×ò L├ñgg till egna bilder</h2>
+            <p class="section-description">Klistra in en bild-URL f├Âr att l├ñgga till den i rotationen. Bilderna sparas i din webbl├ñsare.</p>
+            <div class="input-container">
+                <input type="text" 
+                       id="imageUrlInput" 
+                       placeholder="https://exempel.com/bild.jpg"
+                       aria-label="Bild-URL">
+                <button id="addImageBtn" class="add-btn">L├ñgg till</button>
+            </div>
+            <div id="inputMessage" class="input-message" style="display: none;"></div>
+        </section>
+
+        <!-- UPPDATERING 2026-01-03: Sektion som visar bildstatus -->
+        <section class="image-status-section">
+            <div class="status-grid">
+                <!-- Visar de 9 bilder som visas just nu -->
+                <div class="status-box current-images">
+                    <h3>­ƒû╝´©Å Visas nu (9 bilder)</h3>
+                    <ul id="currentImagesList" class="image-list"></ul>
+                </div>
+                
+                <!-- Visar bilder som v├ñntar i stacken -->
+                <div class="status-box stack-images">
+                    <h3>­ƒôÜ I k├Â (stack)</h3>
+                    <ul id="stackList" class="image-list"></ul>
+                </div>
+                
+                <!-- Visar anv├ñndarens egna tillagda bilder -->
+                <div class="status-box user-images">
+                    <h3>­ƒæñ Dina tillagda bilder</h3>
+                    <ul id="userImagesList" class="image-list"></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Knappar f├Âr dokumentation -->
+        <!-- UPPDATERING 2026-01-03: Lagt till README-knapp som l├ñnkar till GitHub -->
+        <!-- UPPDATERING 2026-01-04: Lagt till Versioner-knapp -->
+        <div class="tech-button-container">
+            <button class="tech-button" id="openModal">
+                <span class="tech-icon">ÔÜÖ´©Å</span> Teknisk Dokumentation
+            </button>
+            <a href="https://github.com/lundgren9/Twitter" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="tech-button readme-button"
+               title="README.md ├ñr en dokumentationsfil som beskriver projektet. Den visas automatiskt p├Ñ GitHub och inneh├Ñller: projektbeskrivning, installationsguide, anv├ñndningsinstruktioner och tekniska detaljer. ├ûppnas i ny flik.">
+                <span class="tech-icon">­ƒôû</span> README p├Ñ GitHub
+            </a>
+            <a href="versioner.html" 
+               class="tech-button versions-button"
+               title="Se tidigare versioner av programmet, l├ñr dig om Git och GitHub, och hur versionshantering fungerar.">
+                <span class="tech-icon">­ƒôÜ</span> Versioner & Git-guide
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Modal-f├Ânster f├Âr teknisk dokumentation -->
+    <!-- Dolt som standard, visas n├ñr anv├ñndaren klickar p├Ñ knappen -->
+    <div id="techModal" class="modal">
+        <div class="modal-content">
+            
+            <!-- St├ñngknapp f├Âr modalen -->
+            <span class="close">├ù</span>
+            
+            <!-- Inneh├Ñll i modal-f├Ânstret -->
+            <h2>Teknisk Dokumentation</h2>
+            <p class="modal-intro">F├Ârklaring av hur bildcollaget fungerar, inklusive video-inb├ñddning och input-funktionalitet.</p>
+            
+            <!-- UPPDATERING 2026-01-03: Uppdaterad dokumentation -->
+            
+            <!-- Nuvarande implementation -->
+            <h3>1. Nuvarande Implementation</h3>
+            <p>Applikationen visar bilder fr├Ñn Twitter/X med hashtag #Bjerredssaltsjobad. Bilderna roterar automatiskt var 4:e sekund med fade-in/fade-out effekter.</p>
+            
+            <h4>Teknisk uppbyggnad:</h4>
+            <ul>
+                <li><strong>HTML:</strong> Strukturerar sidan med 3├ù3 rutn├ñt f├Âr bilder, video-sektion, input-ruta och bildlistor</li>
+                <li><strong>CSS:</strong> Responsiv design med CSS Grid, animationer och modern styling</li>
+                <li><strong>JavaScript:</strong> Hanterar bildv├ñxling, localStorage, input-validering och Twitter widget</li>
+            </ul>
+
+            <div class="info-box">
+                <p><strong>­ƒô© Bildk├ñllor:</strong></p>
+                <ul>
+                    <li>10 bilder fr├Ñn @kentlundgren p├Ñ X/Twitter</li>
+                    <li>M├Âjlighet att l├ñgga till egna bilder via input-rutan</li>
+                    <li>Anv├ñndarbilder sparas i webbl├ñsarens localStorage</li>
+                </ul>
+            </div>
+
+            <!-- UPPDATERING 2026-01-03: Ny sektion om video-inb├ñddning -->
+            <h3>2. Video-inb├ñddning (Twitter oEmbed)</h3>
+            <p>Videon fr├Ñn Bjerreds Saltsj├Âbad b├ñddas in via Twitter's officiella embed-system.</p>
+            
+            <h4>2.1 Hur det fungerar:</h4>
+            <ol>
+                <li><strong>HTML-kod:</strong> En <code>&lt;blockquote class="twitter-tweet"&gt;</code> med l├ñnk till tweeten</li>
+                <li><strong>Twitter Widget:</strong> Scriptet <code>widgets.js</code> fr├Ñn Twitter laddas</li>
+                <li><strong>Rendering:</strong> Twitter's script ers├ñtter blockquote med en interaktiv video-spelare</li>
+            </ol>
+
+            <h4>2.2 Exempel p├Ñ embed-kod:</h4>
+            <pre><code>&lt;blockquote class="twitter-tweet"&gt;
+    &lt;a href="https://twitter.com/kentlundgren/status/1991876902991343647"&gt;&lt;/a&gt;
+&lt;/blockquote&gt;
+&lt;script async src="https://platform.twitter.com/widgets.js"&gt;&lt;/script&gt;</code></pre>
+
+            <h4>2.3 Begr├ñnsningar:</h4>
+            <div class="warning">
+                <ul>
+                    <li>ÔÜá´©Å Kr├ñver internetanslutning f├Âr att ladda videon</li>
+                    <li>ÔÜá´©Å Beroende av Twitter's servrar och widget.js</li>
+                    <li>ÔÜá´©Å Kan blockeras av annonsblockerare eller privacy-till├ñgg</li>
+                </ul>
+            </div>
+
+            <!-- UPPDATERING 2026-01-03: Ny sektion om input-rutan -->
+            <h3>3. Input-ruta f├Âr bilder</h3>
+            <p>Anv├ñndare kan l├ñgga till egna bilder som automatiskt ing├Ñr i rotationen.</p>
+
+            <h4>3.1 S├Ñ fungerar det:</h4>
+            <ol>
+                <li>Anv├ñndaren klistrar in en bild-URL i input-f├ñltet</li>
+                <li>JavaScript validerar att det ├ñr en giltig URL (b├Ârjar med http/https)</li>
+                <li>Bilden l├ñggs till i <code>imagePool</code>-arrayen</li>
+                <li>Bilden sparas till <code>localStorage</code> f├Âr att finnas kvar vid n├ñsta bes├Âk</li>
+                <li>Bildlistorna uppdateras f├Âr att visa den nya bilden</li>
+            </ol>
+
+            <h4>3.2 localStorage - Lokal lagring utan backend</h4>
+            <div class="info-box">
+                <p><strong>Varf├Âr localStorage?</strong></p>
+                <p>localStorage ├ñr en inbyggd funktion i webbl├ñsaren som l├Ñter JavaScript spara data lokalt p├Ñ anv├ñndarens dator. F├Ârdelar:</p>
+                <ul>
+                    <li>Ô£à <strong>Ingen backend kr├ñvs</strong> - allt k├Ârs i webbl├ñsaren</li>
+                    <li>Ô£à <strong>Data finns kvar</strong> ├ñven efter att sidan st├ñngs</li>
+                    <li>Ô£à <strong>Enkelt att implementera</strong> med <code>localStorage.setItem()</code> och <code>getItem()</code></li>
+                    <li>ÔÜá´©Å <strong>Begr├ñnsning:</strong> Data finns endast i den webbl├ñsaren d├ñr det sparades</li>
+                </ul>
+            </div>
+
+            <h4>3.3 Kod-exempel f├Âr localStorage:</h4>
+            <pre><code>// Spara bilder
+function saveUserImages(images) {
+    localStorage.setItem('bjerred_user_images', JSON.stringify(images));
+}
+
+// Ladda bilder
+function loadSavedImages() {
+    const saved = localStorage.getItem('bjerred_user_images');
+    return saved ? JSON.parse(saved) : [];
+}</code></pre>
+
+            <!-- UPPDATERING 2026-01-03: Ny sektion om bildlistor -->
+            <h3>4. Bildlistor och "Stack"</h3>
+            <p>Sidan visar tre listor f├Âr att ge ├Âverblick ├Âver bilderna:</p>
+
+            <h4>4.1 "Visas nu" (9 bilder)</h4>
+            <p>Visar vilka 9 bilder som f├Âr tillf├ñllet visas i 3├ù3-rutn├ñtet. Uppdateras automatiskt var 4:e sekund n├ñr en bild byts ut.</p>
+
+            <h4>4.2 "I k├Â" (stack)</h4>
+            <p>Visar bilder som v├ñntar p├Ñ att visas. N├ñr en bild byts ut i rutn├ñtet h├ñmtas n├ñsta bild fr├Ñn denna k├Â.</p>
+            <div class="info-box">
+                <p><strong>Hur stacken fungerar:</strong></p>
+                <ul>
+                    <li>Alla bilder i <code>imagePool</code> som inte visas just nu ├ñr "i k├Â"</li>
+                    <li>Bilder h├ñmtas sekventiellt (en efter en) fr├Ñn poolen</li>
+                    <li>N├ñr alla bilder visats b├Ârjar det om fr├Ñn b├Ârjan</li>
+                </ul>
+            </div>
+
+            <h4>4.3 "Dina tillagda bilder"</h4>
+            <p>Visar bilder som anv├ñndaren sj├ñlv lagt till via input-rutan. Dessa kan tas bort genom att klicka p├Ñ ├ù bredvid bilden.</p>
+
+            <!-- UPPDATERING 2026-01-03: Ny sektion om lightbox och bildmetadata -->
+            <h3>5. Lightbox och bildmetadata</h3>
+            <p>Klicka p├Ñ en bild i collaget f├Âr att se den i full storlek i en lightbox.</p>
+
+            <h4>5.1 Lightbox-funktioner:</h4>
+            <ul>
+                <li><strong>Visa hela bilden:</strong> Bilden visas i full storlek utan besk├ñrning</li>
+                <li><strong>"├ûppna p├Ñ X":</strong> L├ñnk till originaltweeten (om k├ñnd) eller @kentlundgren</li>
+                <li><strong>St├ñng:</strong> Klicka p├Ñ ├ù eller tryck Escape</li>
+            </ul>
+
+            <h4>5.2 Varf├Âr ├ñr det sv├Ñrt att visa datum och tweet-text?</h4>
+            <div class="warning">
+                <p><strong>ÔÜá´©Å Problemet med Twitter/X-bilddata:</strong></p>
+                <p>N├ñr vi har en bild-URL fr├Ñn Twitter (t.ex. <code>pbs.twimg.com/media/ABC123</code>) finns det <strong>ingen koppling tillbaka</strong> till den ursprungliga tweeten.</p>
+            </div>
+
+            <div class="info-box">
+                <p><strong>Varf├Âr ├ñr detta sv├Ñrt?</strong></p>
+                <ul>
+                    <li>ÔØî Bild-URL:er inneh├Ñller INTE tweet-ID</li>
+                    <li>ÔØî Twitter API:s Free tier till├Ñter INTE omv├ñnd s├Âkning (bild ÔåÆ tweet)</li>
+                    <li>ÔØî Ingen publik tj├ñnst kan koppla bild-URL till tweet</li>
+                    <li>Ô£à Enda l├Âsningen: Manuellt spara tweet-URL n├ñr bilden h├ñmtas</li>
+                </ul>
+            </div>
+
+            <h4>5.3 Hur vi l├Âst det:</h4>
+            <ol>
+                <li>Vi lagrar <strong>manuellt</strong> k├ñnda tweet-URLs i koden (objektet <code>imageMetadata</code>)</li>
+                <li>Om tweet-URL finns ÔåÆ visa "├ûppna p├Ñ X" som g├Ñr till tweeten</li>
+                <li>Om tweet-URL saknas ÔåÆ visa l├ñnk till @kentlundgren p├Ñ X</li>
+            </ol>
+
+            <h4>5.4 Framtida l├Âsning:</h4>
+            <p>Med X API Basic tier (~$100/m├Ñnad) skulle man kunna:</p>
+            <ul>
+                <li>H├ñmta tweets med bilder automatiskt</li>
+                <li>Spara tweet-ID, datum och text tillsammans med varje bild</li>
+                <li>Visa fullst├ñndig information i lightboxen</li>
+            </ul>
+
+            <!-- X/Twitter API information -->
+            <h3>6. X/Twitter API - Framtida m├Âjligheter</h3>
+            
+            <h4>5.1 API-├Ñtkomstniv├Ñer:</h4>
+            <div class="info-box">
+                <p><strong>Free tier (nuvarande):</strong></p>
+                <ul>
+                    <li>ÔØî Kan INTE s├Âka tweets eller hashtags</li>
+                    <li>Ô£à Kan endast posta tweets (1,500/m├Ñnad)</li>
+                    <li>­ƒÆ░ Kostnad: Gratis</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <p><strong>Basic tier (f├Âr automatisk bildh├ñmtning):</strong></p>
+                <ul>
+                    <li>Ô£à Kan s├Âka tweets med hashtags</li>
+                    <li>Ô£à 10,000 tweets/m├Ñnad</li>
+                    <li>Ô£à Tillg├Ñng till Tweet Search API v2</li>
+                    <li>­ƒÆ░ Kostnad: ~$100/m├Ñnad</li>
+                </ul>
+            </div>
+
+            <h4>5.2 API-anrop f├Âr att h├ñmta bilder automatiskt</h4>
+            <p>Med Basic tier skulle f├Âljande API-endpoint anv├ñndas:</p>
+            <pre><code>https://api.twitter.com/2/tweets/search/recent?query=%23Bjerredssaltsjobad&max_results=100&expansions=attachments.media_keys&media.fields=url,preview_image_url</code></pre>
+
+            <h4>5.3 CORS och backend-krav</h4>
+            <p>X/Twitter API till├Ñter <strong>inte</strong> direkta anrop fr├Ñn webbl├ñsaren. En backend-server (t.ex. PHP p├Ñ kentlundgren.se) skulle beh├Âvas som proxy.</p>
+
+            <!-- Framtida f├Ârb├ñttringar -->
+            <h3>7. Framtida F├Ârb├ñttringar</h3>
+            <ul>
+                <li>Automatisk h├ñmtning av bilder via X API (kr├ñver Basic tier)</li>
+                <li>Drag-and-drop f├Âr att ladda upp lokala bilder</li>
+                <li>M├Âjlighet att ├ñndra rotationshastigheten</li>
+                <li>Fullsk├ñrmsl├ñge f├Âr bildcollaget</li>
+                <li>Dela-funktioner f├Âr sociala medier</li>
+                <li>Visa datum och tweet-text f├Âr alla bilder (kr├ñver manuell datainsamling eller API)</li>
+            </ul>
+
+            <!-- Referenser -->
+            <h3>8. Referenser</h3>
+            <ul class="references">
+                <li>X Developer Portal (2025) <em>X API Documentation</em>. Tillg├ñnglig: <a href="https://developer.x.com/en/docs/twitter-api" target="_blank">https://developer.x.com/en/docs/twitter-api</a></li>
+                <li>X Developer Portal (2025) <em>Embedded Tweets</em>. Tillg├ñnglig: <a href="https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets/overview" target="_blank">https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets</a></li>
+                <li>MDN Web Docs (2025) <em>Window.localStorage</em>. Tillg├ñnglig: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank">https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage</a></li>
+                <li>MDN Web Docs (2025) <em>CORS - Cross-Origin Resource Sharing</em>. Tillg├ñnglig: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS</a></li>
+            </ul>
+
+        </div>
+    </div>
+
+    <!-- UPPDATERING 2026-01-03: Lightbox f├Âr att visa bilder i full storlek -->
+    <!-- Klicka p├Ñ en bild i collaget f├Âr att ├Âppna lightbox -->
+    <div id="imageLightbox" class="lightbox" style="display: none;">
+        <div class="lightbox-overlay"></div>
+        <div class="lightbox-content">
+            <button id="closeLightbox" class="lightbox-close" title="St├ñng">├ù</button>
+            <img id="lightboxImage" src="" alt="Fullstor bild">
+            <div class="lightbox-actions">
+                <a id="openOnXBtn" href="#" target="_blank" rel="noopener noreferrer" class="lightbox-btn">
+                    ­ƒÉª ├ûppna p├Ñ X
+                </a>
+            </div>
+            <div id="lightboxImageInfo" class="lightbox-info" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- L├ñnk till extern JavaScript-fil -->
+    <!-- UPPDATERING 2026-01-03: ├ändrad fr├Ñn felaktig absolut s├Âkv├ñg till relativ s├Âkv├ñg -->
+    <script src="javaScript.js"></script>
+
+</body>
+</html>

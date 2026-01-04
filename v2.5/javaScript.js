@@ -1,0 +1,918 @@
+﻿/* ============================================
+   BJERREDS SALTSJ├ûBAD - BILDCOLLAGE JAVASCRIPT
+   ============================================
+   
+   Detta JavaScript-program hanterar:
+   1. Bilder fr├Ñn Twitter/X med hashtag #Bjerredssaltsjobad
+   2. Automatisk bildv├ñxling var 4:e sekund
+   3. Fade-in/fade-out animationer
+   4. Modal-f├Ânster f├Âr teknisk dokumentation
+   5. Input-ruta f├Âr att l├ñgga till egna bilder
+   6. localStorage f├Âr att spara anv├ñndarens bilder
+   7. Visning av aktuella bilder och "stack" (v├ñntande bilder)
+   8. Lightbox f├Âr att visa bilder i full storlek
+   9. Tooltip med datum vid hover
+   
+   UPPDATERING 2026-01-03:
+   - Ersatt Unsplash-bilder med riktiga Twitter-bilder
+   - Lagt till input-ruta f├Âr nya bilder
+   - Lagt till localStorage f├Âr att spara bilder
+   - Lagt till visning av bildstack
+   
+   UPPDATERING 2026-01-04 (Issue #2):
+   - Ut├Âkat fr├Ñn 10 till 16 bilder
+   - Lagt till metadata (datum, tweet-URL) f├Âr 7 bilder
+   - Tooltip vid hover visar bildens datum
+   - refs https://github.com/lundgren9/Twitter/issues/2
+   
+   ============================================ */
+
+// === 1. GLOBALA VARIABLER ===
+
+// UPPDATERING 2026-01-04: Ut├Âkad bildbank med 16 bilder fr├Ñn Twitter/X
+// Dessa bilder kommer fr├Ñn @kentlundgren p├Ñ X med hashtag #Bjerredssaltsjobad
+// Issue #2: https://github.com/lundgren9/Twitter/issues/2
+const defaultImages = [
+    // Ursprungliga bilder
+    'https://pbs.twimg.com/media/G6SRdvUW0AEJc6G?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G6SRdxlWsAAPoIi?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G6SeZh_X0AAVPdc?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G9gcau5WAAAs3nw?format=jpg&name=large',
+    'https://pbs.twimg.com/media/Gx1z6tOWEAEVhU2?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GziGQg-WUAAq9GH?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G0GQS82W0AA_uyb?format=jpg&name=large',
+    'https://pbs.twimg.com/media/Gmvpf-GW4AApxnI?format=jpg&name=large',
+    'https://pbs.twimg.com/media/Gqc3dWeXAAAwFqD?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GXISy3rWEAEc1-y?format=jpg&name=large',
+    // UPPDATERING 2026-01-04: Nya bilder tillagda enligt Issue #2
+    'https://pbs.twimg.com/media/G6SRdvLXgAIP5cm?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G90MSGoXUAAZ82E?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G7abtnfW8AAYksn?format=jpg&name=large',
+    'https://pbs.twimg.com/media/G7abtlqWwAE8LeS?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GgJNp2wXMAAUUml?format=jpg&name=large',
+    'https://pbs.twimg.com/media/GJSzLV4W4AADykr?format=jpg&name=large'
+];
+
+// UPPDATERING 2026-01-04: Metadata f├Âr bilder med tweet-URL och datum
+// Nyckel = bild-ID (fr├Ñn URL), V├ñrde = { tweetUrl, date, text }
+// Datum visas vid hover ├Âver bilden
+const imageMetadata = {
+    // Befintlig bild med uppdaterad metadata
+    'GziGQg-WUAAq9GH': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1961465270280577380',
+        date: '2025-08-29',
+        text: null
+    },
+    // NYA bilder tillagda 2026-01-04 (Issue #2)
+    'G6SRdvLXgAIP5cm': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1991876902991343647/photo/2',
+        date: '2025-11-21',
+        text: null
+    },
+    'G90MSGoXUAAZ82E': {
+        tweetUrl: 'https://x.com/kentlundgren/status/2007774516928500166/photo/1',
+        date: '├Ñr 2025 sista dag: 2025-12-31',
+        text: null
+    },
+    'G7abtnfW8AAYksn': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1996954701070307374/photo/2',
+        date: 'Bl├Ñtt 25-12-05',
+        text: null
+    },
+    'G7abtlqWwAE8LeS': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1996954701070307374/photo/1',
+        date: 'Stol 25-12-05',
+        text: null
+    },
+    'GgJNp2wXMAAUUml': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1874145779319013598/photo/1',
+        date: 'H├Ñkan och Lotta 24-12-31',
+        text: null
+    },
+    'GJSzLV4W4AADykr': {
+        tweetUrl: 'https://x.com/kentlundgren/status/1771237567175790644/photo/1',
+        date: '24-03-22',
+        text: null
+    }
+};
+
+// Bildpool som inneh├Ñller alla bilder (standard + anv├ñndarens egna)
+let imagePool = [];
+
+// Array som h├Ñller aktuella bilder som visas (9 stycken f├Âr 3x3 grid)
+let currentImages = [];
+
+// Index f├Âr vilken bild i imagePool som ska h├ñmtas h├ñrn├ñst
+let imageIndex = 0;
+
+// Intervall-ID f├Âr bildv├ñxlingen (anv├ñnds f├Âr att kunna stoppa interval)
+let imageRotationInterval;
+
+// === 2. LOCALSTORAGE HANTERING ===
+// UPPDATERING 2026-01-03: Ny funktionalitet f├Âr att spara bilder lokalt
+
+/**
+ * Laddar sparade bilder fr├Ñn localStorage
+ * @returns {Array} Array med sparade bild-URLs
+ */
+function loadSavedImages() {
+    try {
+        const saved = localStorage.getItem('bjerred_user_images');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            console.log(`Laddade ${parsed.length} sparade bilder fr├Ñn localStorage`);
+            return parsed;
+        }
+    } catch (error) {
+        console.error('Fel vid laddning fr├Ñn localStorage:', error);
+    }
+    return [];
+}
+
+/**
+ * Sparar anv├ñndarens bilder till localStorage
+ * @param {Array} images - Array med bild-URLs att spara
+ */
+function saveUserImages(images) {
+    try {
+        localStorage.setItem('bjerred_user_images', JSON.stringify(images));
+        console.log(`Sparade ${images.length} bilder till localStorage`);
+    } catch (error) {
+        console.error('Fel vid sparning till localStorage:', error);
+    }
+}
+
+/**
+ * H├ñmtar endast anv├ñndarens tillagda bilder (inte standardbilderna)
+ * @returns {Array} Array med anv├ñndarens bild-URLs
+ */
+function getUserImages() {
+    return imagePool.filter(img => !defaultImages.includes(img));
+}
+
+// === 3. INITIALISERING VID SIDLADDNING ===
+
+// V├ñntar tills hela DOM:en ├ñr laddad innan JavaScript k├Ârs
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Bjerreds Saltsj├Âbad Collage initialiseras...');
+    
+    // UPPDATERING 2026-01-03: Ladda sparade bilder och kombinera med standardbilder
+    initializeImagePool();
+    
+    // Ladda de f├Ârsta 9 bilderna
+    loadInitialImages();
+    
+    // Starta automatisk bildv├ñxling var 4:e sekund (4000 millisekunder)
+    startImageRotation();
+    
+    // S├ñtt upp event listeners f├Âr modal-f├Ânstret
+    setupModal();
+    
+    // UPPDATERING 2026-01-03: S├ñtt upp input-ruta f├Âr nya bilder
+    setupImageInput();
+    
+    // UPPDATERING 2026-01-03: Uppdatera bildlistorna
+    updateImageLists();
+    
+    // UPPDATERING 2026-01-03: S├ñtt upp lightbox f├Âr bildvisning
+    setupLightbox();
+    
+    // Ladda Twitter widget f├Âr video embed
+    loadTwitterWidget();
+    
+    // UPPDATERING 2026-01-04: H├ñmta och visa versionsinformation fr├Ñn GitHub
+    fetchVersionFromGitHub();
+    
+    console.log('Initialisering klar!');
+});
+
+/**
+ * UPPDATERING 2026-01-03: Initialiserar bildpoolen med standard + sparade bilder
+ */
+function initializeImagePool() {
+    // B├Ârja med standardbilderna
+    imagePool = [...defaultImages];
+    
+    // L├ñgg till sparade anv├ñndarbilder
+    const savedImages = loadSavedImages();
+    if (savedImages.length > 0) {
+        imagePool = [...imagePool, ...savedImages];
+        console.log(`Bildpool initialiserad med ${defaultImages.length} standardbilder + ${savedImages.length} sparade bilder`);
+    } else {
+        console.log(`Bildpool initialiserad med ${defaultImages.length} standardbilder`);
+    }
+}
+
+// === 4. BILDHANTERING ===
+
+/**
+ * Laddar de f├Ârsta 9 bilderna vid sidstart
+ * H├ñmtar bilder fr├Ñn imagePool och visar dem i grid:en
+ */
+function loadInitialImages() {
+    console.log('Laddar initiala bilder...');
+    
+    // T├Âm currentImages
+    currentImages = [];
+    
+    // Loopa genom alla 9 bildplatser (img1 till img9)
+    for (let i = 1; i <= 9; i++) {
+        // H├ñmta n├ñsta bild fr├Ñn imagePool
+        const imageUrl = getNextImage();
+        
+        // Spara bilden i currentImages array
+        currentImages.push(imageUrl);
+        
+        // H├ñmta HTML img-elementet
+        const imgElement = document.getElementById(`img${i}`);
+        
+        // S├ñtt bildk├ñllan
+        imgElement.src = imageUrl;
+        
+        // UPPDATERING 2026-01-04: S├ñtt tooltip med datum vid hover
+        setImageTooltip(imgElement, imageUrl);
+        
+        // L├ñgg till event listener som l├ñgger till 'loaded' class n├ñr bilden laddats
+        // Detta triggar fade-in animation via CSS
+        imgElement.addEventListener('load', function() {
+            this.classList.add('loaded');
+        });
+        
+        // Om bilden misslyckas ladda, visa felmeddelande i konsolen
+        imgElement.addEventListener('error', function() {
+            console.error(`Fel vid laddning av bild ${i}: ${imageUrl}`);
+        });
+    }
+    
+    console.log('Initiala bilder laddade:', currentImages);
+    
+    // UPPDATERING 2026-01-03: Uppdatera bildlistorna
+    updateImageLists();
+}
+
+/**
+ * UPPDATERING 2026-01-04: S├ñtter tooltip (title) f├Âr en bild baserat p├Ñ metadata
+ * @param {HTMLElement} imgElement - Bildelementet
+ * @param {string} imageUrl - Bildens URL
+ */
+function setImageTooltip(imgElement, imageUrl) {
+    const imageId = extractImageId(imageUrl);
+    const metadata = imageMetadata[imageId];
+    
+    if (metadata && metadata.date) {
+        // Visa datum vid hover
+        imgElement.title = metadata.date;
+        imgElement.parentElement.title = metadata.date; // S├ñtt ├ñven p├Ñ container
+    } else {
+        imgElement.title = 'Klicka f├Âr att se i full storlek';
+        imgElement.parentElement.title = 'Klicka f├Âr att se i full storlek';
+    }
+}
+
+/**
+ * H├ñmtar n├ñsta bild fr├Ñn bildpoolen
+ * Loopar runt till b├Ârjan n├ñr alla bilder anv├ñnts
+ * @returns {string} URL till n├ñsta bild
+ */
+function getNextImage() {
+    // H├ñmta bild fr├Ñn imagePool p├Ñ aktuellt index
+    const image = imagePool[imageIndex];
+    
+    // ├ûka index f├Âr n├ñsta g├Ñng
+    imageIndex++;
+    
+    // Om vi n├Ñtt slutet av imagePool, b├Ârja om fr├Ñn b├Ârjan
+    if (imageIndex >= imagePool.length) {
+        imageIndex = 0;
+        console.log('Bildpool slut - b├Ârjar om fr├Ñn b├Ârjan');
+    }
+    
+    return image;
+}
+
+/**
+ * Startar automatisk bildv├ñxling med setInterval
+ * Byter ut en slumpm├ñssig bild var 4:e sekund
+ */
+function startImageRotation() {
+    console.log('Startar bildv├ñxling (var 4:e sekund)...');
+    
+    // setInterval k├Âr funktionen varje 4000ms (4 sekunder)
+    imageRotationInterval = setInterval(function() {
+        rotateRandomImage();
+    }, 4000); // 4000 millisekunder = 4 sekunder
+}
+
+/**
+ * Byter ut en slumpm├ñssigt vald bild mot en ny fr├Ñn imagePool
+ * Anv├ñnder fade-out/fade-in effekt f├Âr mjuk ├Âverg├Ñng
+ */
+function rotateRandomImage() {
+    // V├ñlj en slumpm├ñssig bildposition (1-9)
+    const randomPosition = Math.floor(Math.random() * 9) + 1;
+    
+    console.log(`Byter bild p├Ñ position ${randomPosition}`);
+    
+    // H├ñmta HTML img-elementet f├Âr den valda positionen
+    const imgElement = document.getElementById(`img${randomPosition}`);
+    
+    // Ta bort 'loaded' class f├Âr att trigga fade-out via CSS
+    imgElement.classList.remove('loaded');
+    
+    // V├ñnta 800ms (fade-out tiden) innan vi byter bild
+    setTimeout(function() {
+        // H├ñmta en ny bild fr├Ñn poolen
+        const newImageUrl = getNextImage();
+        
+        // Uppdatera currentImages array
+        currentImages[randomPosition - 1] = newImageUrl;
+        
+        // S├ñtt ny bildk├ñlla
+        imgElement.src = newImageUrl;
+        
+        // UPPDATERING 2026-01-04: Uppdatera tooltip med datum
+        setImageTooltip(imgElement, newImageUrl);
+        
+        // N├ñr bilden laddats, l├ñgg tillbaka 'loaded' class f├Âr fade-in
+        imgElement.addEventListener('load', function onLoad() {
+            imgElement.classList.add('loaded');
+            // Ta bort event listener efter anv├ñndning f├Âr att undvika duplicering
+            imgElement.removeEventListener('load', onLoad);
+        });
+        
+        // UPPDATERING 2026-01-03: Uppdatera bildlistorna efter byte
+        updateImageLists();
+        
+    }, 800); // 800ms matchar transition-tiden i CSS
+}
+
+// === 5. INPUT-RUTA F├ûR NYA BILDER ===
+// UPPDATERING 2026-01-03: Ny funktionalitet
+
+/**
+ * S├ñtter upp event listeners f├Âr input-rutan d├ñr anv├ñndare kan l├ñgga till bilder
+ */
+function setupImageInput() {
+    const addButton = document.getElementById('addImageBtn');
+    const imageInput = document.getElementById('imageUrlInput');
+    
+    if (!addButton || !imageInput) {
+        console.warn('Input-element f├Âr bilder hittades inte');
+        return;
+    }
+    
+    // L├ñgg till bild n├ñr knappen klickas
+    addButton.addEventListener('click', function() {
+        addNewImage();
+    });
+    
+    // L├ñgg till bild n├ñr Enter trycks i input-f├ñltet
+    imageInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            addNewImage();
+        }
+    });
+    
+    console.log('Input-ruta f├Âr bilder uppsatt');
+}
+
+/**
+ * L├ñgger till en ny bild fr├Ñn input-f├ñltet till bildpoolen
+ */
+function addNewImage() {
+    const imageInput = document.getElementById('imageUrlInput');
+    const url = imageInput.value.trim();
+    
+    // Validera URL
+    if (!url) {
+        showMessage('Ange en bild-URL', 'error');
+        return;
+    }
+    
+    // Enkel URL-validering
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        showMessage('URL m├Ñste b├Ârja med http:// eller https://', 'error');
+        return;
+    }
+    
+    // Kontrollera om bilden redan finns
+    if (imagePool.includes(url)) {
+        showMessage('Denna bild finns redan i poolen', 'error');
+        return;
+    }
+    
+    // L├ñgg till bilden i poolen
+    imagePool.push(url);
+    console.log(`Ny bild tillagd: ${url}`);
+    
+    // Spara anv├ñndarbilder till localStorage
+    saveUserImages(getUserImages());
+    
+    // T├Âm input-f├ñltet
+    imageInput.value = '';
+    
+    // Visa bekr├ñftelse
+    showMessage('Bild tillagd!', 'success');
+    
+    // Uppdatera listorna
+    updateImageLists();
+}
+
+/**
+ * Visar ett meddelande f├Âr anv├ñndaren
+ * @param {string} message - Meddelandet att visa
+ * @param {string} type - 'success' eller 'error'
+ */
+function showMessage(message, type) {
+    const messageEl = document.getElementById('inputMessage');
+    if (messageEl) {
+        messageEl.textContent = message;
+        messageEl.className = `input-message ${type}`;
+        messageEl.style.display = 'block';
+        
+        // D├Âlj meddelandet efter 3 sekunder
+        setTimeout(() => {
+            messageEl.style.display = 'none';
+        }, 3000);
+    }
+}
+
+/**
+ * Tar bort en anv├ñndartillagd bild fr├Ñn poolen
+ * @param {string} url - URL:en till bilden som ska tas bort
+ */
+function removeUserImage(url) {
+    // Ta bort fr├Ñn imagePool
+    const index = imagePool.indexOf(url);
+    if (index > -1) {
+        imagePool.splice(index, 1);
+        console.log(`Bild borttagen: ${url}`);
+        
+        // Spara uppdaterad lista
+        saveUserImages(getUserImages());
+        
+        // Uppdatera listorna
+        updateImageLists();
+        
+        showMessage('Bild borttagen', 'success');
+    }
+}
+
+// G├Âr removeUserImage tillg├ñnglig globalt f├Âr onclick
+window.removeUserImage = removeUserImage;
+
+// === 6. BILDLISTOR (VISADE + STACK) ===
+// UPPDATERING 2026-01-03: Ny funktionalitet
+
+/**
+ * Uppdaterar listorna som visar vilka bilder som visas och vilka som v├ñntar
+ */
+function updateImageLists() {
+    updateCurrentImagesList();
+    updateStackList();
+    updateUserImagesList();
+}
+
+/**
+ * Uppdaterar listan ├Âver de 9 bilder som visas just nu
+ */
+function updateCurrentImagesList() {
+    const listEl = document.getElementById('currentImagesList');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+    
+    currentImages.forEach((url, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="position-badge">${index + 1}</span> ${getImageName(url)}`;
+        li.title = url; // Visa full URL vid hover
+        listEl.appendChild(li);
+    });
+}
+
+/**
+ * Uppdaterar listan ├Âver bilder som v├ñntar i stacken
+ */
+function updateStackList() {
+    const listEl = document.getElementById('stackList');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+    
+    // Ber├ñkna vilka bilder som ├ñr i stacken (inte visas just nu)
+    const stackImages = imagePool.filter(img => !currentImages.includes(img));
+    
+    if (stackImages.length === 0) {
+        listEl.innerHTML = '<li class="empty-message">Alla bilder visas just nu</li>';
+        return;
+    }
+    
+    stackImages.forEach((url, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = getImageName(url);
+        li.title = url;
+        listEl.appendChild(li);
+    });
+}
+
+/**
+ * Uppdaterar listan ├Âver anv├ñndarens egna tillagda bilder
+ */
+function updateUserImagesList() {
+    const listEl = document.getElementById('userImagesList');
+    if (!listEl) return;
+    
+    const userImages = getUserImages();
+    listEl.innerHTML = '';
+    
+    if (userImages.length === 0) {
+        listEl.innerHTML = '<li class="empty-message">Inga egna bilder tillagda</li>';
+        return;
+    }
+    
+    userImages.forEach((url) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span class="user-image-name">${getImageName(url)}</span>
+            <button class="remove-btn" onclick="removeUserImage('${url}')" title="Ta bort">├ù</button>
+        `;
+        li.title = url;
+        listEl.appendChild(li);
+    });
+}
+
+/**
+ * Extraherar ett kortare namn fr├Ñn en bild-URL
+ * @param {string} url - Bild-URL
+ * @returns {string} F├Ârkortat namn
+ */
+function getImageName(url) {
+    try {
+        // F├Âr Twitter-bilder, extrahera media-ID
+        if (url.includes('pbs.twimg.com')) {
+            const match = url.match(/media\/([A-Za-z0-9_-]+)/);
+            if (match) {
+                return `Twitter: ${match[1].substring(0, 12)}...`;
+            }
+        }
+        
+        // F├Âr andra bilder, ta sista delen av URL:en
+        const parts = url.split('/');
+        let name = parts[parts.length - 1];
+        
+        // Ta bort query parameters
+        name = name.split('?')[0];
+        
+        // F├Ârkorta om f├Âr l├Ñngt
+        if (name.length > 25) {
+            name = name.substring(0, 22) + '...';
+        }
+        
+        return name;
+    } catch (e) {
+        return 'Ok├ñnd bild';
+    }
+}
+
+// === 7. MODAL-HANTERING ===
+
+/**
+ * S├ñtter upp event listeners f├Âr modal-f├Ânstret
+ * Hanterar ├Âppning och st├ñngning av teknisk dokumentation
+ */
+function setupModal() {
+    console.log('S├ñtter upp modal-f├Ânster...');
+    
+    // H├ñmta DOM-element
+    const modal = document.getElementById('techModal');
+    const openButton = document.getElementById('openModal');
+    const closeButton = document.getElementsByClassName('close')[0];
+    
+    // N├ñr anv├ñndaren klickar p├Ñ "Teknisk Dokumentation"-knappen
+    openButton.addEventListener('click', function() {
+        console.log('├ûppnar teknisk dokumentation...');
+        modal.style.display = 'block'; // Visa modal
+        document.body.style.overflow = 'hidden'; // F├Ârhindra scrolling bakom modal
+    });
+    
+    // N├ñr anv├ñndaren klickar p├Ñ X (st├ñng-knappen)
+    closeButton.addEventListener('click', function() {
+        console.log('St├ñnger teknisk dokumentation...');
+        closeModal();
+    });
+    
+    // N├ñr anv├ñndaren klickar utanf├Âr modal-inneh├Ñllet (p├Ñ bakgrunden)
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            console.log('Klick utanf├Âr modal - st├ñnger...');
+            closeModal();
+        }
+    });
+    
+    // St├ñng modal med Escape-tangenten
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            console.log('Escape-tangent tryckt - st├ñnger modal...');
+            closeModal();
+        }
+    });
+    
+    console.log('Modal setup klar!');
+}
+
+/**
+ * Hj├ñlpfunktion f├Âr att st├ñnga modal-f├Ânstret
+ */
+function closeModal() {
+    const modal = document.getElementById('techModal');
+    modal.style.display = 'none'; // D├Âlj modal
+    document.body.style.overflow = 'auto'; // ├àterst├ñll scrolling
+}
+
+// === 8. LIGHTBOX F├ûR BILDVISNING ===
+// UPPDATERING 2026-01-03: Ny funktionalitet f├Âr att visa bilder i fullstorlek
+
+/**
+ * S├ñtter upp lightbox-funktionalitet f├Âr bilderna
+ * G├Âr s├Ñ att man kan klicka p├Ñ en bild f├Âr att se den i full storlek
+ */
+function setupLightbox() {
+    console.log('S├ñtter upp lightbox...');
+    
+    // H├ñmta alla bildslots
+    const imageSlots = document.querySelectorAll('.image-slot');
+    
+    // L├ñgg till klick-h├ñndelse p├Ñ varje bildslot
+    imageSlots.forEach((slot) => {
+        slot.style.cursor = 'pointer'; // Visa att bilden ├ñr klickbar
+        slot.addEventListener('click', function() {
+            const img = this.querySelector('img');
+            if (img && img.src) {
+                openLightbox(img.src);
+            }
+        });
+    });
+    
+    // S├ñtt upp st├ñngning av lightbox
+    const lightbox = document.getElementById('imageLightbox');
+    const closeBtn = document.getElementById('closeLightbox');
+    
+    if (lightbox && closeBtn) {
+        // St├ñng vid klick p├Ñ X
+        closeBtn.addEventListener('click', closeLightbox);
+        
+        // St├ñng vid klick utanf├Âr bilden
+        lightbox.addEventListener('click', function(event) {
+            if (event.target === lightbox || event.target.classList.contains('lightbox-overlay')) {
+                closeLightbox();
+            }
+        });
+        
+        // St├ñng med Escape-tangenten
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && lightbox.style.display === 'flex') {
+                closeLightbox();
+            }
+        });
+    }
+    
+    console.log('Lightbox setup klar!');
+}
+
+/**
+ * ├ûppnar lightbox med angiven bild
+ * @param {string} imageUrl - URL till bilden som ska visas
+ */
+function openLightbox(imageUrl) {
+    console.log('├ûppnar lightbox f├Âr:', imageUrl);
+    
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const openOnXBtn = document.getElementById('openOnXBtn');
+    const imageInfo = document.getElementById('lightboxImageInfo');
+    
+    if (!lightbox || !lightboxImg) {
+        console.error('Lightbox-element hittades inte');
+        return;
+    }
+    
+    // S├ñtt bilden
+    lightboxImg.src = imageUrl;
+    
+    // H├ñmta metadata f├Âr bilden om den finns
+    const imageId = extractImageId(imageUrl);
+    const metadata = imageMetadata[imageId];
+    
+    // Uppdatera "├ûppna p├Ñ X"-knappen
+    if (openOnXBtn) {
+        if (metadata && metadata.tweetUrl) {
+            // Vi har en k├ñnd tweet-URL
+            openOnXBtn.href = metadata.tweetUrl;
+            openOnXBtn.title = '├ûppna originaltweeten p├Ñ X';
+        } else {
+            // Ingen k├ñnd tweet-URL - l├ñnka till s├Âkning p├Ñ @kentlundgren
+            openOnXBtn.href = 'https://x.com/kentlundgren';
+            openOnXBtn.title = 'Bes├Âk @kentlundgren p├Ñ X (tweet-URL ok├ñnd)';
+        }
+    }
+    
+    // Visa bildinfo om det finns
+    if (imageInfo) {
+        if (metadata) {
+            let infoHtml = '<p><strong>Bildinfo:</strong></p>';
+            if (metadata.date) {
+                infoHtml += `<p>­ƒôà Datum: ${metadata.date}</p>`;
+            }
+            if (metadata.text) {
+                infoHtml += `<p>­ƒÆ¼ "${metadata.text}"</p>`;
+            }
+            if (!metadata.date && !metadata.text) {
+                infoHtml += '<p class="info-note">Ôä╣´©Å Datum och text ├ñr ok├ñnt f├Âr denna bild.<br>Klicka "├ûppna p├Ñ X" f├Âr att se originaltweeten.</p>';
+            }
+            imageInfo.innerHTML = infoHtml;
+            imageInfo.style.display = 'block';
+        } else {
+            imageInfo.innerHTML = '<p class="info-note">Ôä╣´©Å Ingen metadata tillg├ñnglig f├Âr denna bild.<br>Bes├Âk @kentlundgren p├Ñ X f├Âr att hitta originaltweeten.</p>';
+            imageInfo.style.display = 'block';
+        }
+    }
+    
+    // Visa lightbox
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * St├ñnger lightbox
+ */
+function closeLightbox() {
+    const lightbox = document.getElementById('imageLightbox');
+    if (lightbox) {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/**
+ * Extraherar bild-ID fr├Ñn en Twitter bild-URL
+ * @param {string} url - Bild-URL
+ * @returns {string|null} Bild-ID eller null
+ */
+function extractImageId(url) {
+    if (url && url.includes('pbs.twimg.com')) {
+        const match = url.match(/media\/([A-Za-z0-9_-]+)/);
+        if (match) {
+            return match[1];
+        }
+    }
+    return null;
+}
+
+// G├Âr lightbox-funktioner tillg├ñngliga globalt
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+
+// === 9. TWITTER WIDGET F├ûR VIDEO ===
+// UPPDATERING 2026-01-03: Ny funktionalitet f├Âr inb├ñddad video
+
+/**
+ * Laddar Twitter widget.js f├Âr att rendera inb├ñddade tweets/videos
+ */
+function loadTwitterWidget() {
+    // Kontrollera om scriptet redan ├ñr laddat
+    if (window.twttr) {
+        console.log('Twitter widget redan laddat');
+        return;
+    }
+    
+    // Skapa och l├ñgg till Twitter widget script
+    const script = document.createElement('script');
+    script.src = 'https://platform.twitter.com/widgets.js';
+    script.async = true;
+    script.charset = 'utf-8';
+    
+    script.onload = function() {
+        console.log('Twitter widget laddat');
+        // Rendera alla Twitter embeds
+        if (window.twttr && window.twttr.widgets) {
+            window.twttr.widgets.load();
+        }
+    };
+    
+    document.body.appendChild(script);
+}
+
+// === 10. GITHUB VERSION H├äMTNING ===
+// UPPDATERING 2026-01-04: H├ñmtar och visar versionsinformation fr├Ñn GitHub
+
+/**
+ * H├ñmtar senaste release/version fr├Ñn GitHub API och visar den p├Ñ sidan
+ * Anv├ñnder GitHub API: https://api.github.com/repos/{owner}/{repo}/releases/latest
+ */
+async function fetchVersionFromGitHub() {
+    const versionBadge = document.getElementById('versionBadge');
+    const versionText = document.getElementById('versionText');
+    
+    if (!versionBadge || !versionText) {
+        console.log('Versionselement hittades inte');
+        return;
+    }
+    
+    // Visa laddningsindikator
+    versionBadge.classList.add('loading');
+    versionText.textContent = 'Laddar...';
+    
+    try {
+        // H├ñmta senaste release fr├Ñn GitHub API
+        const response = await fetch('https://api.github.com/repos/lundgren9/Twitter/releases/latest', {
+            headers: {
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const release = await response.json();
+        
+        // Formatera datum
+        const releaseDate = new Date(release.published_at);
+        const formattedDate = releaseDate.toLocaleDateString('sv-SE', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        
+        // Uppdatera badge
+        versionBadge.classList.remove('loading');
+        versionText.innerHTML = `${release.tag_name} <span class="version-date">${formattedDate}</span>`;
+        versionBadge.title = `${release.name || release.tag_name}\nSl├ñppt: ${formattedDate}\nKlicka f├Âr att se p├Ñ GitHub`;
+        
+        // G├Âr badge klickbar
+        versionBadge.style.cursor = 'pointer';
+        versionBadge.addEventListener('click', function() {
+            window.open(release.html_url, '_blank');
+        });
+        
+        console.log(`Version h├ñmtad: ${release.tag_name} (${formattedDate})`);
+        
+    } catch (error) {
+        console.error('Fel vid h├ñmtning av version:', error);
+        
+        // Visa fallback-version
+        versionBadge.classList.remove('loading');
+        versionBadge.classList.add('error');
+        versionText.textContent = 'v2.0';
+        versionBadge.title = 'Kunde inte h├ñmta senaste version fr├Ñn GitHub';
+    }
+}
+
+// === 11. DEBUG & HJ├äLPFUNKTIONER ===
+
+/**
+ * Stoppar bildv├ñxlingen (anv├ñndbar f├Âr debugging)
+ */
+function stopImageRotation() {
+    if (imageRotationInterval) {
+        clearInterval(imageRotationInterval);
+        console.log('Bildv├ñxling stoppad');
+    }
+}
+
+/**
+ * Loggar aktuell status till konsolen (f├Âr debugging)
+ */
+function debugStatus() {
+    console.log('=== DEBUG STATUS ===');
+    console.log('Antal bilder i pool:', imagePool.length);
+    console.log('Standardbilder:', defaultImages.length);
+    console.log('Anv├ñndarbilder:', getUserImages().length);
+    console.log('Aktuellt bildindex:', imageIndex);
+    console.log('Visade bilder:', currentImages);
+    console.log('I stacken:', imagePool.filter(img => !currentImages.includes(img)).length);
+    console.log('Rotation aktiv:', imageRotationInterval !== undefined);
+    console.log('===================');
+}
+
+/**
+ * Rensar alla anv├ñndarbilder fr├Ñn localStorage
+ */
+function clearUserImages() {
+    localStorage.removeItem('bjerred_user_images');
+    imagePool = [...defaultImages];
+    imageIndex = 0;
+    loadInitialImages();
+    updateImageLists();
+    showMessage('Alla anv├ñndarbilder borttagna', 'success');
+    console.log('Anv├ñndarbilder rensade');
+}
+
+// G├Âr debug-funktioner tillg├ñngliga globalt f├Âr anv├ñndning i konsolen
+window.stopImageRotation = stopImageRotation;
+window.debugStatus = debugStatus;
+window.clearUserImages = clearUserImages;
+
+console.log('­ƒÆí Tip: Skriv debugStatus() i konsolen f├Âr att se aktuell status');
+console.log('­ƒÆí Tip: Skriv stopImageRotation() i konsolen f├Âr att stoppa bildv├ñxlingen');
+console.log('­ƒÆí Tip: Skriv clearUserImages() i konsolen f├Âr att rensa alla egna bilder');
