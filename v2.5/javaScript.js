@@ -1,27 +1,27 @@
-﻿/* ============================================
-   BJERREDS SALTSJ├ûBAD - BILDCOLLAGE JAVASCRIPT
+/* ============================================
+   BJERREDS SALTSJÖBAD - BILDCOLLAGE JAVASCRIPT
    ============================================
    
    Detta JavaScript-program hanterar:
-   1. Bilder fr├Ñn Twitter/X med hashtag #Bjerredssaltsjobad
-   2. Automatisk bildv├ñxling var 4:e sekund
+   1. Bilder från Twitter/X med hashtag #Bjerredssaltsjobad
+   2. Automatisk bildväxling var 4:e sekund
    3. Fade-in/fade-out animationer
-   4. Modal-f├Ânster f├Âr teknisk dokumentation
-   5. Input-ruta f├Âr att l├ñgga till egna bilder
-   6. localStorage f├Âr att spara anv├ñndarens bilder
-   7. Visning av aktuella bilder och "stack" (v├ñntande bilder)
-   8. Lightbox f├Âr att visa bilder i full storlek
+   4. Modal-fönster för teknisk dokumentation
+   5. Input-ruta för att lägga till egna bilder
+   6. localStorage för att spara användarens bilder
+   7. Visning av aktuella bilder och "stack" (väntande bilder)
+   8. Lightbox för att visa bilder i full storlek
    9. Tooltip med datum vid hover
    
    UPPDATERING 2026-01-03:
    - Ersatt Unsplash-bilder med riktiga Twitter-bilder
-   - Lagt till input-ruta f├Âr nya bilder
-   - Lagt till localStorage f├Âr att spara bilder
+   - Lagt till input-ruta för nya bilder
+   - Lagt till localStorage för att spara bilder
    - Lagt till visning av bildstack
    
    UPPDATERING 2026-01-04 (Issue #2):
-   - Ut├Âkat fr├Ñn 10 till 16 bilder
-   - Lagt till metadata (datum, tweet-URL) f├Âr 7 bilder
+   - Utökat från 10 till 16 bilder
+   - Lagt till metadata (datum, tweet-URL) för 7 bilder
    - Tooltip vid hover visar bildens datum
    - refs https://github.com/lundgren9/Twitter/issues/2
    
@@ -29,8 +29,8 @@
 
 // === 1. GLOBALA VARIABLER ===
 
-// UPPDATERING 2026-01-04: Ut├Âkad bildbank med 16 bilder fr├Ñn Twitter/X
-// Dessa bilder kommer fr├Ñn @kentlundgren p├Ñ X med hashtag #Bjerredssaltsjobad
+// UPPDATERING 2026-01-04: Utökad bildbank med 16 bilder från Twitter/X
+// Dessa bilder kommer från @kentlundgren på X med hashtag #Bjerredssaltsjobad
 // Issue #2: https://github.com/lundgren9/Twitter/issues/2
 const defaultImages = [
     // Ursprungliga bilder
@@ -53,9 +53,9 @@ const defaultImages = [
     'https://pbs.twimg.com/media/GJSzLV4W4AADykr?format=jpg&name=large'
 ];
 
-// UPPDATERING 2026-01-04: Metadata f├Âr bilder med tweet-URL och datum
-// Nyckel = bild-ID (fr├Ñn URL), V├ñrde = { tweetUrl, date, text }
-// Datum visas vid hover ├Âver bilden
+// UPPDATERING 2026-01-04: Metadata för bilder med tweet-URL och datum
+// Nyckel = bild-ID (från URL), Värde = { tweetUrl, date, text }
+// Datum visas vid hover över bilden
 const imageMetadata = {
     // Befintlig bild med uppdaterad metadata
     'GziGQg-WUAAq9GH': {
@@ -71,12 +71,12 @@ const imageMetadata = {
     },
     'G90MSGoXUAAZ82E': {
         tweetUrl: 'https://x.com/kentlundgren/status/2007774516928500166/photo/1',
-        date: '├Ñr 2025 sista dag: 2025-12-31',
+        date: 'år 2025 sista dag: 2025-12-31',
         text: null
     },
     'G7abtnfW8AAYksn': {
         tweetUrl: 'https://x.com/kentlundgren/status/1996954701070307374/photo/2',
-        date: 'Bl├Ñtt 25-12-05',
+        date: 'Blått 25-12-05',
         text: null
     },
     'G7abtlqWwAE8LeS': {
@@ -86,7 +86,7 @@ const imageMetadata = {
     },
     'GgJNp2wXMAAUUml': {
         tweetUrl: 'https://x.com/kentlundgren/status/1874145779319013598/photo/1',
-        date: 'H├Ñkan och Lotta 24-12-31',
+        date: 'Håkan och Lotta 24-12-31',
         text: null
     },
     'GJSzLV4W4AADykr': {
@@ -96,23 +96,23 @@ const imageMetadata = {
     }
 };
 
-// Bildpool som inneh├Ñller alla bilder (standard + anv├ñndarens egna)
+// Bildpool som innehåller alla bilder (standard + användarens egna)
 let imagePool = [];
 
-// Array som h├Ñller aktuella bilder som visas (9 stycken f├Âr 3x3 grid)
+// Array som håller aktuella bilder som visas (9 stycken för 3x3 grid)
 let currentImages = [];
 
-// Index f├Âr vilken bild i imagePool som ska h├ñmtas h├ñrn├ñst
+// Index för vilken bild i imagePool som ska hämtas härnäst
 let imageIndex = 0;
 
-// Intervall-ID f├Âr bildv├ñxlingen (anv├ñnds f├Âr att kunna stoppa interval)
+// Intervall-ID för bildväxlingen (används för att kunna stoppa interval)
 let imageRotationInterval;
 
 // === 2. LOCALSTORAGE HANTERING ===
-// UPPDATERING 2026-01-03: Ny funktionalitet f├Âr att spara bilder lokalt
+// UPPDATERING 2026-01-03: Ny funktionalitet för att spara bilder lokalt
 
 /**
- * Laddar sparade bilder fr├Ñn localStorage
+ * Laddar sparade bilder från localStorage
  * @returns {Array} Array med sparade bild-URLs
  */
 function loadSavedImages() {
@@ -120,17 +120,17 @@ function loadSavedImages() {
         const saved = localStorage.getItem('bjerred_user_images');
         if (saved) {
             const parsed = JSON.parse(saved);
-            console.log(`Laddade ${parsed.length} sparade bilder fr├Ñn localStorage`);
+            console.log(`Laddade ${parsed.length} sparade bilder från localStorage`);
             return parsed;
         }
     } catch (error) {
-        console.error('Fel vid laddning fr├Ñn localStorage:', error);
+        console.error('Fel vid laddning från localStorage:', error);
     }
     return [];
 }
 
 /**
- * Sparar anv├ñndarens bilder till localStorage
+ * Sparar användarens bilder till localStorage
  * @param {Array} images - Array med bild-URLs att spara
  */
 function saveUserImages(images) {
@@ -143,8 +143,8 @@ function saveUserImages(images) {
 }
 
 /**
- * H├ñmtar endast anv├ñndarens tillagda bilder (inte standardbilderna)
- * @returns {Array} Array med anv├ñndarens bild-URLs
+ * Hämtar endast användarens tillagda bilder (inte standardbilderna)
+ * @returns {Array} Array med användarens bild-URLs
  */
 function getUserImages() {
     return imagePool.filter(img => !defaultImages.includes(img));
@@ -152,35 +152,35 @@ function getUserImages() {
 
 // === 3. INITIALISERING VID SIDLADDNING ===
 
-// V├ñntar tills hela DOM:en ├ñr laddad innan JavaScript k├Ârs
+// Väntar tills hela DOM:en är laddad innan JavaScript körs
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Bjerreds Saltsj├Âbad Collage initialiseras...');
+    console.log('Bjerreds Saltsjöbad Collage initialiseras...');
     
     // UPPDATERING 2026-01-03: Ladda sparade bilder och kombinera med standardbilder
     initializeImagePool();
     
-    // Ladda de f├Ârsta 9 bilderna
+    // Ladda de första 9 bilderna
     loadInitialImages();
     
-    // Starta automatisk bildv├ñxling var 4:e sekund (4000 millisekunder)
+    // Starta automatisk bildväxling var 4:e sekund (4000 millisekunder)
     startImageRotation();
     
-    // S├ñtt upp event listeners f├Âr modal-f├Ânstret
+    // Sätt upp event listeners för modal-fönstret
     setupModal();
     
-    // UPPDATERING 2026-01-03: S├ñtt upp input-ruta f├Âr nya bilder
+    // UPPDATERING 2026-01-03: Sätt upp input-ruta för nya bilder
     setupImageInput();
     
     // UPPDATERING 2026-01-03: Uppdatera bildlistorna
     updateImageLists();
     
-    // UPPDATERING 2026-01-03: S├ñtt upp lightbox f├Âr bildvisning
+    // UPPDATERING 2026-01-03: Sätt upp lightbox för bildvisning
     setupLightbox();
     
-    // Ladda Twitter widget f├Âr video embed
+    // Ladda Twitter widget för video embed
     loadTwitterWidget();
     
-    // UPPDATERING 2026-01-04: H├ñmta och visa versionsinformation fr├Ñn GitHub
+    // UPPDATERING 2026-01-04: Hämta och visa versionsinformation från GitHub
     fetchVersionFromGitHub();
     
     console.log('Initialisering klar!');
@@ -190,10 +190,10 @@ document.addEventListener('DOMContentLoaded', function() {
  * UPPDATERING 2026-01-03: Initialiserar bildpoolen med standard + sparade bilder
  */
 function initializeImagePool() {
-    // B├Ârja med standardbilderna
+    // Börja med standardbilderna
     imagePool = [...defaultImages];
     
-    // L├ñgg till sparade anv├ñndarbilder
+    // Lägg till sparade användarbilder
     const savedImages = loadSavedImages();
     if (savedImages.length > 0) {
         imagePool = [...imagePool, ...savedImages];
@@ -206,33 +206,33 @@ function initializeImagePool() {
 // === 4. BILDHANTERING ===
 
 /**
- * Laddar de f├Ârsta 9 bilderna vid sidstart
- * H├ñmtar bilder fr├Ñn imagePool och visar dem i grid:en
+ * Laddar de första 9 bilderna vid sidstart
+ * Hämtar bilder från imagePool och visar dem i grid:en
  */
 function loadInitialImages() {
     console.log('Laddar initiala bilder...');
     
-    // T├Âm currentImages
+    // Töm currentImages
     currentImages = [];
     
     // Loopa genom alla 9 bildplatser (img1 till img9)
     for (let i = 1; i <= 9; i++) {
-        // H├ñmta n├ñsta bild fr├Ñn imagePool
+        // Hämta nästa bild från imagePool
         const imageUrl = getNextImage();
         
         // Spara bilden i currentImages array
         currentImages.push(imageUrl);
         
-        // H├ñmta HTML img-elementet
+        // Hämta HTML img-elementet
         const imgElement = document.getElementById(`img${i}`);
         
-        // S├ñtt bildk├ñllan
+        // Sätt bildkällan
         imgElement.src = imageUrl;
         
-        // UPPDATERING 2026-01-04: S├ñtt tooltip med datum vid hover
+        // UPPDATERING 2026-01-04: Sätt tooltip med datum vid hover
         setImageTooltip(imgElement, imageUrl);
         
-        // L├ñgg till event listener som l├ñgger till 'loaded' class n├ñr bilden laddats
+        // Lägg till event listener som lägger till 'loaded' class när bilden laddats
         // Detta triggar fade-in animation via CSS
         imgElement.addEventListener('load', function() {
             this.classList.add('loaded');
@@ -251,7 +251,7 @@ function loadInitialImages() {
 }
 
 /**
- * UPPDATERING 2026-01-04: S├ñtter tooltip (title) f├Âr en bild baserat p├Ñ metadata
+ * UPPDATERING 2026-01-04: Sätter tooltip (title) för en bild baserat på metadata
  * @param {HTMLElement} imgElement - Bildelementet
  * @param {string} imageUrl - Bildens URL
  */
@@ -262,81 +262,81 @@ function setImageTooltip(imgElement, imageUrl) {
     if (metadata && metadata.date) {
         // Visa datum vid hover
         imgElement.title = metadata.date;
-        imgElement.parentElement.title = metadata.date; // S├ñtt ├ñven p├Ñ container
+        imgElement.parentElement.title = metadata.date; // Sätt även på container
     } else {
-        imgElement.title = 'Klicka f├Âr att se i full storlek';
-        imgElement.parentElement.title = 'Klicka f├Âr att se i full storlek';
+        imgElement.title = 'Klicka för att se i full storlek';
+        imgElement.parentElement.title = 'Klicka för att se i full storlek';
     }
 }
 
 /**
- * H├ñmtar n├ñsta bild fr├Ñn bildpoolen
- * Loopar runt till b├Ârjan n├ñr alla bilder anv├ñnts
- * @returns {string} URL till n├ñsta bild
+ * Hämtar nästa bild från bildpoolen
+ * Loopar runt till början när alla bilder använts
+ * @returns {string} URL till nästa bild
  */
 function getNextImage() {
-    // H├ñmta bild fr├Ñn imagePool p├Ñ aktuellt index
+    // Hämta bild från imagePool på aktuellt index
     const image = imagePool[imageIndex];
     
-    // ├ûka index f├Âr n├ñsta g├Ñng
+    // Öka index för nästa gång
     imageIndex++;
     
-    // Om vi n├Ñtt slutet av imagePool, b├Ârja om fr├Ñn b├Ârjan
+    // Om vi nått slutet av imagePool, börja om från början
     if (imageIndex >= imagePool.length) {
         imageIndex = 0;
-        console.log('Bildpool slut - b├Ârjar om fr├Ñn b├Ârjan');
+        console.log('Bildpool slut - börjar om från början');
     }
     
     return image;
 }
 
 /**
- * Startar automatisk bildv├ñxling med setInterval
- * Byter ut en slumpm├ñssig bild var 4:e sekund
+ * Startar automatisk bildväxling med setInterval
+ * Byter ut en slumpmässig bild var 4:e sekund
  */
 function startImageRotation() {
-    console.log('Startar bildv├ñxling (var 4:e sekund)...');
+    console.log('Startar bildväxling (var 4:e sekund)...');
     
-    // setInterval k├Âr funktionen varje 4000ms (4 sekunder)
+    // setInterval kör funktionen varje 4000ms (4 sekunder)
     imageRotationInterval = setInterval(function() {
         rotateRandomImage();
     }, 4000); // 4000 millisekunder = 4 sekunder
 }
 
 /**
- * Byter ut en slumpm├ñssigt vald bild mot en ny fr├Ñn imagePool
- * Anv├ñnder fade-out/fade-in effekt f├Âr mjuk ├Âverg├Ñng
+ * Byter ut en slumpmässigt vald bild mot en ny från imagePool
+ * Använder fade-out/fade-in effekt för mjuk övergång
  */
 function rotateRandomImage() {
-    // V├ñlj en slumpm├ñssig bildposition (1-9)
+    // Välj en slumpmässig bildposition (1-9)
     const randomPosition = Math.floor(Math.random() * 9) + 1;
     
-    console.log(`Byter bild p├Ñ position ${randomPosition}`);
+    console.log(`Byter bild på position ${randomPosition}`);
     
-    // H├ñmta HTML img-elementet f├Âr den valda positionen
+    // Hämta HTML img-elementet för den valda positionen
     const imgElement = document.getElementById(`img${randomPosition}`);
     
-    // Ta bort 'loaded' class f├Âr att trigga fade-out via CSS
+    // Ta bort 'loaded' class för att trigga fade-out via CSS
     imgElement.classList.remove('loaded');
     
-    // V├ñnta 800ms (fade-out tiden) innan vi byter bild
+    // Vänta 800ms (fade-out tiden) innan vi byter bild
     setTimeout(function() {
-        // H├ñmta en ny bild fr├Ñn poolen
+        // Hämta en ny bild från poolen
         const newImageUrl = getNextImage();
         
         // Uppdatera currentImages array
         currentImages[randomPosition - 1] = newImageUrl;
         
-        // S├ñtt ny bildk├ñlla
+        // Sätt ny bildkälla
         imgElement.src = newImageUrl;
         
         // UPPDATERING 2026-01-04: Uppdatera tooltip med datum
         setImageTooltip(imgElement, newImageUrl);
         
-        // N├ñr bilden laddats, l├ñgg tillbaka 'loaded' class f├Âr fade-in
+        // När bilden laddats, lägg tillbaka 'loaded' class för fade-in
         imgElement.addEventListener('load', function onLoad() {
             imgElement.classList.add('loaded');
-            // Ta bort event listener efter anv├ñndning f├Âr att undvika duplicering
+            // Ta bort event listener efter användning för att undvika duplicering
             imgElement.removeEventListener('load', onLoad);
         });
         
@@ -346,38 +346,38 @@ function rotateRandomImage() {
     }, 800); // 800ms matchar transition-tiden i CSS
 }
 
-// === 5. INPUT-RUTA F├ûR NYA BILDER ===
+// === 5. INPUT-RUTA FÖR NYA BILDER ===
 // UPPDATERING 2026-01-03: Ny funktionalitet
 
 /**
- * S├ñtter upp event listeners f├Âr input-rutan d├ñr anv├ñndare kan l├ñgga till bilder
+ * Sätter upp event listeners för input-rutan där användare kan lägga till bilder
  */
 function setupImageInput() {
     const addButton = document.getElementById('addImageBtn');
     const imageInput = document.getElementById('imageUrlInput');
     
     if (!addButton || !imageInput) {
-        console.warn('Input-element f├Âr bilder hittades inte');
+        console.warn('Input-element för bilder hittades inte');
         return;
     }
     
-    // L├ñgg till bild n├ñr knappen klickas
+    // Lägg till bild när knappen klickas
     addButton.addEventListener('click', function() {
         addNewImage();
     });
     
-    // L├ñgg till bild n├ñr Enter trycks i input-f├ñltet
+    // Lägg till bild när Enter trycks i input-fältet
     imageInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             addNewImage();
         }
     });
     
-    console.log('Input-ruta f├Âr bilder uppsatt');
+    console.log('Input-ruta för bilder uppsatt');
 }
 
 /**
- * L├ñgger till en ny bild fr├Ñn input-f├ñltet till bildpoolen
+ * Lägger till en ny bild från input-fältet till bildpoolen
  */
 function addNewImage() {
     const imageInput = document.getElementById('imageUrlInput');
@@ -391,7 +391,7 @@ function addNewImage() {
     
     // Enkel URL-validering
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        showMessage('URL m├Ñste b├Ârja med http:// eller https://', 'error');
+        showMessage('URL måste börja med http:// eller https://', 'error');
         return;
     }
     
@@ -401,17 +401,17 @@ function addNewImage() {
         return;
     }
     
-    // L├ñgg till bilden i poolen
+    // Lägg till bilden i poolen
     imagePool.push(url);
     console.log(`Ny bild tillagd: ${url}`);
     
-    // Spara anv├ñndarbilder till localStorage
+    // Spara användarbilder till localStorage
     saveUserImages(getUserImages());
     
-    // T├Âm input-f├ñltet
+    // Töm input-fältet
     imageInput.value = '';
     
-    // Visa bekr├ñftelse
+    // Visa bekräftelse
     showMessage('Bild tillagd!', 'success');
     
     // Uppdatera listorna
@@ -419,7 +419,7 @@ function addNewImage() {
 }
 
 /**
- * Visar ett meddelande f├Âr anv├ñndaren
+ * Visar ett meddelande för användaren
  * @param {string} message - Meddelandet att visa
  * @param {string} type - 'success' eller 'error'
  */
@@ -430,7 +430,7 @@ function showMessage(message, type) {
         messageEl.className = `input-message ${type}`;
         messageEl.style.display = 'block';
         
-        // D├Âlj meddelandet efter 3 sekunder
+        // Dölj meddelandet efter 3 sekunder
         setTimeout(() => {
             messageEl.style.display = 'none';
         }, 3000);
@@ -438,11 +438,11 @@ function showMessage(message, type) {
 }
 
 /**
- * Tar bort en anv├ñndartillagd bild fr├Ñn poolen
+ * Tar bort en användartillagd bild från poolen
  * @param {string} url - URL:en till bilden som ska tas bort
  */
 function removeUserImage(url) {
-    // Ta bort fr├Ñn imagePool
+    // Ta bort från imagePool
     const index = imagePool.indexOf(url);
     if (index > -1) {
         imagePool.splice(index, 1);
@@ -458,14 +458,14 @@ function removeUserImage(url) {
     }
 }
 
-// G├Âr removeUserImage tillg├ñnglig globalt f├Âr onclick
+// Gör removeUserImage tillgänglig globalt för onclick
 window.removeUserImage = removeUserImage;
 
 // === 6. BILDLISTOR (VISADE + STACK) ===
 // UPPDATERING 2026-01-03: Ny funktionalitet
 
 /**
- * Uppdaterar listorna som visar vilka bilder som visas och vilka som v├ñntar
+ * Uppdaterar listorna som visar vilka bilder som visas och vilka som väntar
  */
 function updateImageLists() {
     updateCurrentImagesList();
@@ -474,7 +474,7 @@ function updateImageLists() {
 }
 
 /**
- * Uppdaterar listan ├Âver de 9 bilder som visas just nu
+ * Uppdaterar listan över de 9 bilder som visas just nu
  */
 function updateCurrentImagesList() {
     const listEl = document.getElementById('currentImagesList');
@@ -491,7 +491,7 @@ function updateCurrentImagesList() {
 }
 
 /**
- * Uppdaterar listan ├Âver bilder som v├ñntar i stacken
+ * Uppdaterar listan över bilder som väntar i stacken
  */
 function updateStackList() {
     const listEl = document.getElementById('stackList');
@@ -499,7 +499,7 @@ function updateStackList() {
     
     listEl.innerHTML = '';
     
-    // Ber├ñkna vilka bilder som ├ñr i stacken (inte visas just nu)
+    // Beräkna vilka bilder som är i stacken (inte visas just nu)
     const stackImages = imagePool.filter(img => !currentImages.includes(img));
     
     if (stackImages.length === 0) {
@@ -516,7 +516,7 @@ function updateStackList() {
 }
 
 /**
- * Uppdaterar listan ├Âver anv├ñndarens egna tillagda bilder
+ * Uppdaterar listan över användarens egna tillagda bilder
  */
 function updateUserImagesList() {
     const listEl = document.getElementById('userImagesList');
@@ -534,7 +534,7 @@ function updateUserImagesList() {
         const li = document.createElement('li');
         li.innerHTML = `
             <span class="user-image-name">${getImageName(url)}</span>
-            <button class="remove-btn" onclick="removeUserImage('${url}')" title="Ta bort">├ù</button>
+            <button class="remove-btn" onclick="removeUserImage('${url}')" title="Ta bort">×</button>
         `;
         li.title = url;
         listEl.appendChild(li);
@@ -542,13 +542,13 @@ function updateUserImagesList() {
 }
 
 /**
- * Extraherar ett kortare namn fr├Ñn en bild-URL
+ * Extraherar ett kortare namn från en bild-URL
  * @param {string} url - Bild-URL
- * @returns {string} F├Ârkortat namn
+ * @returns {string} Förkortat namn
  */
 function getImageName(url) {
     try {
-        // F├Âr Twitter-bilder, extrahera media-ID
+        // För Twitter-bilder, extrahera media-ID
         if (url.includes('pbs.twimg.com')) {
             const match = url.match(/media\/([A-Za-z0-9_-]+)/);
             if (match) {
@@ -556,63 +556,63 @@ function getImageName(url) {
             }
         }
         
-        // F├Âr andra bilder, ta sista delen av URL:en
+        // För andra bilder, ta sista delen av URL:en
         const parts = url.split('/');
         let name = parts[parts.length - 1];
         
         // Ta bort query parameters
         name = name.split('?')[0];
         
-        // F├Ârkorta om f├Âr l├Ñngt
+        // Förkorta om för långt
         if (name.length > 25) {
             name = name.substring(0, 22) + '...';
         }
         
         return name;
     } catch (e) {
-        return 'Ok├ñnd bild';
+        return 'Okänd bild';
     }
 }
 
 // === 7. MODAL-HANTERING ===
 
 /**
- * S├ñtter upp event listeners f├Âr modal-f├Ânstret
- * Hanterar ├Âppning och st├ñngning av teknisk dokumentation
+ * Sätter upp event listeners för modal-fönstret
+ * Hanterar öppning och stängning av teknisk dokumentation
  */
 function setupModal() {
-    console.log('S├ñtter upp modal-f├Ânster...');
+    console.log('Sätter upp modal-fönster...');
     
-    // H├ñmta DOM-element
+    // Hämta DOM-element
     const modal = document.getElementById('techModal');
     const openButton = document.getElementById('openModal');
     const closeButton = document.getElementsByClassName('close')[0];
     
-    // N├ñr anv├ñndaren klickar p├Ñ "Teknisk Dokumentation"-knappen
+    // När användaren klickar på "Teknisk Dokumentation"-knappen
     openButton.addEventListener('click', function() {
-        console.log('├ûppnar teknisk dokumentation...');
+        console.log('Öppnar teknisk dokumentation...');
         modal.style.display = 'block'; // Visa modal
-        document.body.style.overflow = 'hidden'; // F├Ârhindra scrolling bakom modal
+        document.body.style.overflow = 'hidden'; // Förhindra scrolling bakom modal
     });
     
-    // N├ñr anv├ñndaren klickar p├Ñ X (st├ñng-knappen)
+    // När användaren klickar på X (stäng-knappen)
     closeButton.addEventListener('click', function() {
-        console.log('St├ñnger teknisk dokumentation...');
+        console.log('Stänger teknisk dokumentation...');
         closeModal();
     });
     
-    // N├ñr anv├ñndaren klickar utanf├Âr modal-inneh├Ñllet (p├Ñ bakgrunden)
+    // När användaren klickar utanför modal-innehållet (på bakgrunden)
     window.addEventListener('click', function(event) {
         if (event.target === modal) {
-            console.log('Klick utanf├Âr modal - st├ñnger...');
+            console.log('Klick utanför modal - stänger...');
             closeModal();
         }
     });
     
-    // St├ñng modal med Escape-tangenten
+    // Stäng modal med Escape-tangenten
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && modal.style.display === 'block') {
-            console.log('Escape-tangent tryckt - st├ñnger modal...');
+            console.log('Escape-tangent tryckt - stänger modal...');
             closeModal();
         }
     });
@@ -621,30 +621,30 @@ function setupModal() {
 }
 
 /**
- * Hj├ñlpfunktion f├Âr att st├ñnga modal-f├Ânstret
+ * Hjälpfunktion för att stänga modal-fönstret
  */
 function closeModal() {
     const modal = document.getElementById('techModal');
-    modal.style.display = 'none'; // D├Âlj modal
-    document.body.style.overflow = 'auto'; // ├àterst├ñll scrolling
+    modal.style.display = 'none'; // Dölj modal
+    document.body.style.overflow = 'auto'; // Återställ scrolling
 }
 
-// === 8. LIGHTBOX F├ûR BILDVISNING ===
-// UPPDATERING 2026-01-03: Ny funktionalitet f├Âr att visa bilder i fullstorlek
+// === 8. LIGHTBOX FÖR BILDVISNING ===
+// UPPDATERING 2026-01-03: Ny funktionalitet för att visa bilder i fullstorlek
 
 /**
- * S├ñtter upp lightbox-funktionalitet f├Âr bilderna
- * G├Âr s├Ñ att man kan klicka p├Ñ en bild f├Âr att se den i full storlek
+ * Sätter upp lightbox-funktionalitet för bilderna
+ * Gör så att man kan klicka på en bild för att se den i full storlek
  */
 function setupLightbox() {
-    console.log('S├ñtter upp lightbox...');
+    console.log('Sätter upp lightbox...');
     
-    // H├ñmta alla bildslots
+    // Hämta alla bildslots
     const imageSlots = document.querySelectorAll('.image-slot');
     
-    // L├ñgg till klick-h├ñndelse p├Ñ varje bildslot
+    // Lägg till klick-händelse på varje bildslot
     imageSlots.forEach((slot) => {
-        slot.style.cursor = 'pointer'; // Visa att bilden ├ñr klickbar
+        slot.style.cursor = 'pointer'; // Visa att bilden är klickbar
         slot.addEventListener('click', function() {
             const img = this.querySelector('img');
             if (img && img.src) {
@@ -653,22 +653,22 @@ function setupLightbox() {
         });
     });
     
-    // S├ñtt upp st├ñngning av lightbox
+    // Sätt upp stängning av lightbox
     const lightbox = document.getElementById('imageLightbox');
     const closeBtn = document.getElementById('closeLightbox');
     
     if (lightbox && closeBtn) {
-        // St├ñng vid klick p├Ñ X
+        // Stäng vid klick på X
         closeBtn.addEventListener('click', closeLightbox);
         
-        // St├ñng vid klick utanf├Âr bilden
+        // Stäng vid klick utanför bilden
         lightbox.addEventListener('click', function(event) {
             if (event.target === lightbox || event.target.classList.contains('lightbox-overlay')) {
                 closeLightbox();
             }
         });
         
-        // St├ñng med Escape-tangenten
+        // Stäng med Escape-tangenten
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape' && lightbox.style.display === 'flex') {
                 closeLightbox();
@@ -680,11 +680,11 @@ function setupLightbox() {
 }
 
 /**
- * ├ûppnar lightbox med angiven bild
+ * Öppnar lightbox med angiven bild
  * @param {string} imageUrl - URL till bilden som ska visas
  */
 function openLightbox(imageUrl) {
-    console.log('├ûppnar lightbox f├Âr:', imageUrl);
+    console.log('Öppnar lightbox för:', imageUrl);
     
     const lightbox = document.getElementById('imageLightbox');
     const lightboxImg = document.getElementById('lightboxImage');
@@ -696,23 +696,23 @@ function openLightbox(imageUrl) {
         return;
     }
     
-    // S├ñtt bilden
+    // Sätt bilden
     lightboxImg.src = imageUrl;
     
-    // H├ñmta metadata f├Âr bilden om den finns
+    // Hämta metadata för bilden om den finns
     const imageId = extractImageId(imageUrl);
     const metadata = imageMetadata[imageId];
     
-    // Uppdatera "├ûppna p├Ñ X"-knappen
+    // Uppdatera "Öppna på X"-knappen
     if (openOnXBtn) {
         if (metadata && metadata.tweetUrl) {
-            // Vi har en k├ñnd tweet-URL
+            // Vi har en känd tweet-URL
             openOnXBtn.href = metadata.tweetUrl;
-            openOnXBtn.title = '├ûppna originaltweeten p├Ñ X';
+            openOnXBtn.title = 'Öppna originaltweeten på X';
         } else {
-            // Ingen k├ñnd tweet-URL - l├ñnka till s├Âkning p├Ñ @kentlundgren
+            // Ingen känd tweet-URL - länka till sökning på @kentlundgren
             openOnXBtn.href = 'https://x.com/kentlundgren';
-            openOnXBtn.title = 'Bes├Âk @kentlundgren p├Ñ X (tweet-URL ok├ñnd)';
+            openOnXBtn.title = 'Besök @kentlundgren på X (tweet-URL okänd)';
         }
     }
     
@@ -721,18 +721,18 @@ function openLightbox(imageUrl) {
         if (metadata) {
             let infoHtml = '<p><strong>Bildinfo:</strong></p>';
             if (metadata.date) {
-                infoHtml += `<p>­ƒôà Datum: ${metadata.date}</p>`;
+                infoHtml += `<p>📅 Datum: ${metadata.date}</p>`;
             }
             if (metadata.text) {
-                infoHtml += `<p>­ƒÆ¼ "${metadata.text}"</p>`;
+                infoHtml += `<p>💬 "${metadata.text}"</p>`;
             }
             if (!metadata.date && !metadata.text) {
-                infoHtml += '<p class="info-note">Ôä╣´©Å Datum och text ├ñr ok├ñnt f├Âr denna bild.<br>Klicka "├ûppna p├Ñ X" f├Âr att se originaltweeten.</p>';
+                infoHtml += '<p class="info-note">ℹ️ Datum och text är okänt för denna bild.<br>Klicka "Öppna på X" för att se originaltweeten.</p>';
             }
             imageInfo.innerHTML = infoHtml;
             imageInfo.style.display = 'block';
         } else {
-            imageInfo.innerHTML = '<p class="info-note">Ôä╣´©Å Ingen metadata tillg├ñnglig f├Âr denna bild.<br>Bes├Âk @kentlundgren p├Ñ X f├Âr att hitta originaltweeten.</p>';
+            imageInfo.innerHTML = '<p class="info-note">ℹ️ Ingen metadata tillgänglig för denna bild.<br>Besök @kentlundgren på X för att hitta originaltweeten.</p>';
             imageInfo.style.display = 'block';
         }
     }
@@ -743,7 +743,7 @@ function openLightbox(imageUrl) {
 }
 
 /**
- * St├ñnger lightbox
+ * Stänger lightbox
  */
 function closeLightbox() {
     const lightbox = document.getElementById('imageLightbox');
@@ -754,7 +754,7 @@ function closeLightbox() {
 }
 
 /**
- * Extraherar bild-ID fr├Ñn en Twitter bild-URL
+ * Extraherar bild-ID från en Twitter bild-URL
  * @param {string} url - Bild-URL
  * @returns {string|null} Bild-ID eller null
  */
@@ -768,24 +768,24 @@ function extractImageId(url) {
     return null;
 }
 
-// G├Âr lightbox-funktioner tillg├ñngliga globalt
+// Gör lightbox-funktioner tillgängliga globalt
 window.openLightbox = openLightbox;
 window.closeLightbox = closeLightbox;
 
-// === 9. TWITTER WIDGET F├ûR VIDEO ===
-// UPPDATERING 2026-01-03: Ny funktionalitet f├Âr inb├ñddad video
+// === 9. TWITTER WIDGET FÖR VIDEO ===
+// UPPDATERING 2026-01-03: Ny funktionalitet för inbäddad video
 
 /**
- * Laddar Twitter widget.js f├Âr att rendera inb├ñddade tweets/videos
+ * Laddar Twitter widget.js för att rendera inbäddade tweets/videos
  */
 function loadTwitterWidget() {
-    // Kontrollera om scriptet redan ├ñr laddat
+    // Kontrollera om scriptet redan är laddat
     if (window.twttr) {
         console.log('Twitter widget redan laddat');
         return;
     }
     
-    // Skapa och l├ñgg till Twitter widget script
+    // Skapa och lägg till Twitter widget script
     const script = document.createElement('script');
     script.src = 'https://platform.twitter.com/widgets.js';
     script.async = true;
@@ -802,12 +802,12 @@ function loadTwitterWidget() {
     document.body.appendChild(script);
 }
 
-// === 10. GITHUB VERSION H├äMTNING ===
-// UPPDATERING 2026-01-04: H├ñmtar och visar versionsinformation fr├Ñn GitHub
+// === 10. GITHUB VERSION HÄMTNING ===
+// UPPDATERING 2026-01-04: Hämtar och visar versionsinformation från GitHub
 
 /**
- * H├ñmtar senaste release/version fr├Ñn GitHub API och visar den p├Ñ sidan
- * Anv├ñnder GitHub API: https://api.github.com/repos/{owner}/{repo}/releases/latest
+ * Hämtar senaste release/version från GitHub API och visar den på sidan
+ * Använder GitHub API: https://api.github.com/repos/{owner}/{repo}/releases/latest
  */
 async function fetchVersionFromGitHub() {
     const versionBadge = document.getElementById('versionBadge');
@@ -823,7 +823,7 @@ async function fetchVersionFromGitHub() {
     versionText.textContent = 'Laddar...';
     
     try {
-        // H├ñmta senaste release fr├Ñn GitHub API
+        // Hämta senaste release från GitHub API
         const response = await fetch('https://api.github.com/repos/lundgren9/Twitter/releases/latest', {
             headers: {
                 'Accept': 'application/vnd.github.v3+json'
@@ -847,47 +847,47 @@ async function fetchVersionFromGitHub() {
         // Uppdatera badge
         versionBadge.classList.remove('loading');
         versionText.innerHTML = `${release.tag_name} <span class="version-date">${formattedDate}</span>`;
-        versionBadge.title = `${release.name || release.tag_name}\nSl├ñppt: ${formattedDate}\nKlicka f├Âr att se p├Ñ GitHub`;
+        versionBadge.title = `${release.name || release.tag_name}\nSläppt: ${formattedDate}\nKlicka för att se på GitHub`;
         
-        // G├Âr badge klickbar
+        // Gör badge klickbar
         versionBadge.style.cursor = 'pointer';
         versionBadge.addEventListener('click', function() {
             window.open(release.html_url, '_blank');
         });
         
-        console.log(`Version h├ñmtad: ${release.tag_name} (${formattedDate})`);
+        console.log(`Version hämtad: ${release.tag_name} (${formattedDate})`);
         
     } catch (error) {
-        console.error('Fel vid h├ñmtning av version:', error);
+        console.error('Fel vid hämtning av version:', error);
         
         // Visa fallback-version
         versionBadge.classList.remove('loading');
         versionBadge.classList.add('error');
         versionText.textContent = 'v2.0';
-        versionBadge.title = 'Kunde inte h├ñmta senaste version fr├Ñn GitHub';
+        versionBadge.title = 'Kunde inte hämta senaste version från GitHub';
     }
 }
 
-// === 11. DEBUG & HJ├äLPFUNKTIONER ===
+// === 11. DEBUG & HJÄLPFUNKTIONER ===
 
 /**
- * Stoppar bildv├ñxlingen (anv├ñndbar f├Âr debugging)
+ * Stoppar bildväxlingen (användbar för debugging)
  */
 function stopImageRotation() {
     if (imageRotationInterval) {
         clearInterval(imageRotationInterval);
-        console.log('Bildv├ñxling stoppad');
+        console.log('Bildväxling stoppad');
     }
 }
 
 /**
- * Loggar aktuell status till konsolen (f├Âr debugging)
+ * Loggar aktuell status till konsolen (för debugging)
  */
 function debugStatus() {
     console.log('=== DEBUG STATUS ===');
     console.log('Antal bilder i pool:', imagePool.length);
     console.log('Standardbilder:', defaultImages.length);
-    console.log('Anv├ñndarbilder:', getUserImages().length);
+    console.log('Användarbilder:', getUserImages().length);
     console.log('Aktuellt bildindex:', imageIndex);
     console.log('Visade bilder:', currentImages);
     console.log('I stacken:', imagePool.filter(img => !currentImages.includes(img)).length);
@@ -896,7 +896,7 @@ function debugStatus() {
 }
 
 /**
- * Rensar alla anv├ñndarbilder fr├Ñn localStorage
+ * Rensar alla användarbilder från localStorage
  */
 function clearUserImages() {
     localStorage.removeItem('bjerred_user_images');
@@ -904,15 +904,15 @@ function clearUserImages() {
     imageIndex = 0;
     loadInitialImages();
     updateImageLists();
-    showMessage('Alla anv├ñndarbilder borttagna', 'success');
-    console.log('Anv├ñndarbilder rensade');
+    showMessage('Alla användarbilder borttagna', 'success');
+    console.log('Användarbilder rensade');
 }
 
-// G├Âr debug-funktioner tillg├ñngliga globalt f├Âr anv├ñndning i konsolen
+// Gör debug-funktioner tillgängliga globalt för användning i konsolen
 window.stopImageRotation = stopImageRotation;
 window.debugStatus = debugStatus;
 window.clearUserImages = clearUserImages;
 
-console.log('­ƒÆí Tip: Skriv debugStatus() i konsolen f├Âr att se aktuell status');
-console.log('­ƒÆí Tip: Skriv stopImageRotation() i konsolen f├Âr att stoppa bildv├ñxlingen');
-console.log('­ƒÆí Tip: Skriv clearUserImages() i konsolen f├Âr att rensa alla egna bilder');
+console.log('💡 Tip: Skriv debugStatus() i konsolen för att se aktuell status');
+console.log('💡 Tip: Skriv stopImageRotation() i konsolen för att stoppa bildväxlingen');
+console.log('💡 Tip: Skriv clearUserImages() i konsolen för att rensa alla egna bilder');

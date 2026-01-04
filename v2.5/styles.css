@@ -1,36 +1,36 @@
-﻿/* ============================================
-   BJERREDS SALTSJ├ûBAD - BILDCOLLAGE CSS
+/* ============================================
+   BJERREDS SALTSJÖBAD - BILDCOLLAGE CSS
    ============================================
    
-   Denna CSS-fil inneh├Ñller all styling f├Âr bildcollaget.
-   Huvudfokus ├ñr p├Ñ:
-   - Responsiv design (fungerar p├Ñ desktop och mobil)
-   - CSS Grid f├Âr bildrutn├ñt
-   - Modal-f├Ânster f├Âr teknisk dokumentation
-   - Fade-animationer f├Âr bildv├ñxling
+   Denna CSS-fil innehåller all styling för bildcollaget.
+   Huvudfokus är på:
+   - Responsiv design (fungerar på desktop och mobil)
+   - CSS Grid för bildrutnät
+   - Modal-fönster för teknisk dokumentation
+   - Fade-animationer för bildväxling
    
    UPPDATERING 2026-01-03:
-   - Lagt till styling f├Âr video-sektion
-   - Lagt till styling f├Âr input-ruta (med gul bakgrund)
-   - Lagt till styling f├Âr bildstatus-listor
-   - Uppdaterat responsiv design f├Âr nya element
+   - Lagt till styling för video-sektion
+   - Lagt till styling för input-ruta (med gul bakgrund)
+   - Lagt till styling för bildstatus-listor
+   - Uppdaterat responsiv design för nya element
    
    ============================================ */
 
-/* === 1. GRUNDL├äGGANDE RESET OCH TYPOGRAFI === */
+/* === 1. GRUNDLÄGGANDE RESET OCH TYPOGRAFI === */
 
-/* ├àterst├ñller standardmarginaler och padding f├Âr alla element */
+/* Återställer standardmarginaler och padding för alla element */
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* G├Âr att padding och border inkluderas i elementets bredd */
+    box-sizing: border-box; /* Gör att padding och border inkluderas i elementets bredd */
 }
 
-/* Grundl├ñggande body-styling */
+/* Grundläggande body-styling */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradient bakgrund */
-    min-height: 100vh; /* Minst hela viewporten i h├Âjd */
+    min-height: 100vh; /* Minst hela viewporten i höjd */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -40,11 +40,11 @@ body {
 
 /* === 2. HUVUDCONTAINER === */
 
-/* Container som h├Ñller allt inneh├Ñll */
+/* Container som håller allt innehåll */
 .container {
     background: white;
-    border-radius: 20px; /* Rundade h├Ârn */
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); /* Skugga f├Âr djup */
+    border-radius: 20px; /* Rundade hörn */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); /* Skugga för djup */
     padding: 40px;
     max-width: 1200px;
     width: 100%;
@@ -72,7 +72,7 @@ header h1 {
     margin-bottom: 5px;
 }
 
-/* K├ñllinformation med l├ñnk till X-konto */
+/* Källinformation med länk till X-konto */
 .source {
     font-size: 0.9em;
     color: #888;
@@ -109,53 +109,53 @@ header h1 {
     font-size: 0.9em;
 }
 
-/* === 4. BILDRUTN├äT (IMAGE GRID) === */
+/* === 4. BILDRUTNÄT (IMAGE GRID) === */
 
-/* CSS Grid f├Âr 3x3 rutn├ñt av bilder */
+/* CSS Grid för 3x3 rutnät av bilder */
 .image-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Tre lika breda kolumner */
-    grid-template-rows: repeat(3, 1fr); /* Tre lika h├Âga rader */
+    grid-template-rows: repeat(3, 1fr); /* Tre lika höga rader */
     gap: 15px; /* Mellanrum mellan bilderna */
     margin-bottom: 30px;
     width: 100%;
-    aspect-ratio: 1 / 1; /* Kvadratiskt rutn├ñt */
+    aspect-ratio: 1 / 1; /* Kvadratiskt rutnät */
 }
 
-/* Varje bildslot (container f├Âr en bild) */
+/* Varje bildslot (container för en bild) */
 .image-slot {
-    background: #f0f0f0; /* Ljusgr├Ñ bakgrund n├ñr bild laddar */
+    background: #f0f0f0; /* Ljusgrå bakgrund när bild laddar */
     border-radius: 10px;
-    overflow: hidden; /* Klipper av bilder som ├ñr f├Âr stora */
+    overflow: hidden; /* Klipper av bilder som är för stora */
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease; /* Mjuk ├Âverg├Ñng vid hover */
+    transition: transform 0.3s ease; /* Mjuk övergång vid hover */
 }
 
-/* Hover-effekt: Bilden zoomar lite n├ñr man hovrar */
+/* Hover-effekt: Bilden zoomar lite när man hovrar */
 .image-slot:hover {
-    transform: scale(1.05); /* F├Ârstora med 5% */
+    transform: scale(1.05); /* Förstora med 5% */
 }
 
-/* Bilderna sj├ñlva */
+/* Bilderna själva */
 .image-slot img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Besk├ñr bilden f├Âr att fylla hela slot:en */
+    object-fit: cover; /* Beskär bilden för att fylla hela slot:en */
     display: block;
-    opacity: 0; /* B├Ârjar osynlig f├Âr fade-in effekt */
+    opacity: 0; /* Börjar osynlig för fade-in effekt */
     transition: opacity 0.8s ease-in-out; /* Mjuk fade-transition */
 }
 
-/* Klass som l├ñggs till n├ñr bild ├ñr laddad - g├Âr bilden synlig */
+/* Klass som läggs till när bild är laddad - gör bilden synlig */
 .image-slot img.loaded {
     opacity: 1;
 }
 
 /* === 5. TEKNISK DOKUMENTATIONS-KNAPP === */
 
-/* Container f├Âr knapparna */
-/* UPPDATERING 2026-01-03: Uppdaterad f├Âr att visa flera knappar */
+/* Container för knapparna */
+/* UPPDATERING 2026-01-03: Uppdaterad för att visa flera knappar */
 .tech-button-container {
     text-align: center;
     margin-top: 20px;
@@ -165,7 +165,7 @@ header h1 {
     flex-wrap: wrap;
 }
 
-/* Sj├ñlva knappen */
+/* Själva knappen */
 .tech-button {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -187,21 +187,21 @@ header h1 {
     font-size: 1.3em;
 }
 
-/* Hover-effekt p├Ñ knappen */
+/* Hover-effekt på knappen */
 .tech-button:hover {
     transform: translateY(-2px); /* Lyfter knappen lite */
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
-/* Active-state (n├ñr man klickar) */
+/* Active-state (när man klickar) */
 .tech-button:active {
     transform: translateY(0);
 }
 
-/* UPPDATERING 2026-01-03: README-knapp som l├ñnk till GitHub */
+/* UPPDATERING 2026-01-03: README-knapp som länk till GitHub */
 .readme-button {
-    background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%); /* GitHub-f├ñrger */
-    text-decoration: none; /* Ta bort l├ñnk-understrykning */
+    background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%); /* GitHub-färger */
+    text-decoration: none; /* Ta bort länk-understrykning */
 }
 
 .readme-button:hover {
@@ -210,23 +210,23 @@ header h1 {
     box-shadow: 0 6px 20px rgba(36, 41, 46, 0.5);
 }
 
-/* === 6. MODAL-F├ûNSTER === */
+/* === 6. MODAL-FÖNSTER === */
 
-/* Bakgrund f├Âr modal (t├ñcker hela sk├ñrmen) */
+/* Bakgrund för modal (täcker hela skärmen) */
 .modal {
     display: none; /* Dolt som standard */
     position: fixed;
-    z-index: 1000; /* Ligger ├Âver allt annat */
+    z-index: 1000; /* Ligger över allt annat */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Scrollbar om inneh├Ñllet ├ñr f├Âr l├Ñngt */
+    overflow: auto; /* Scrollbar om innehållet är för långt */
     background-color: rgba(0, 0, 0, 0.6); /* Halvtransparent svart bakgrund */
-    animation: fadeIn 0.3s ease-in-out; /* Fade-in animation n├ñr modal ├Âppnas */
+    animation: fadeIn 0.3s ease-in-out; /* Fade-in animation när modal öppnas */
 }
 
-/* Sj├ñlva modal-inneh├Ñllet (den vita boxen) */
+/* Själva modal-innehållet (den vita boxen) */
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto; /* Centrerad vertikalt och horisontellt */
@@ -235,13 +235,13 @@ header h1 {
     border-radius: 15px;
     width: 90%;
     max-width: 900px;
-    max-height: 85vh; /* Max 85% av viewporth├Âjden */
-    overflow-y: auto; /* Scrollbar om inneh├Ñllet ├ñr f├Âr l├Ñngt */
+    max-height: 85vh; /* Max 85% av viewporthöjden */
+    overflow-y: auto; /* Scrollbar om innehållet är för långt */
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     animation: slideDown 0.4s ease-out; /* Slide-down animation */
 }
 
-/* St├ñng-knapp (X) */
+/* Stäng-knapp (X) */
 .close {
     color: #aaa;
     float: right;
@@ -306,7 +306,7 @@ header h1 {
     color: #444;
 }
 
-/* Info-boxar f├Âr API-tiers */
+/* Info-boxar för API-tiers */
 .info-box {
     background: #f8f9fa;
     border-left: 4px solid #667eea;
@@ -329,13 +329,13 @@ header h1 {
     color: #856404;
 }
 
-/* Kodblock (f├Âr exempel p├Ñ kod) */
+/* Kodblock (för exempel på kod) */
 .modal-content pre {
     background: #2d2d2d;
     color: #f8f8f2;
     padding: 15px;
     border-radius: 8px;
-    overflow-x: auto; /* Horisontell scroll om koden ├ñr f├Âr bred */
+    overflow-x: auto; /* Horisontell scroll om koden är för bred */
     margin: 15px 0;
     font-family: 'Courier New', monospace;
     font-size: 0.9em;
@@ -347,7 +347,7 @@ header h1 {
     font-size: 0.9em;
 }
 
-/* L├ñnkar i modalen */
+/* Länkar i modalen */
 .modal-content a {
     color: #667eea;
     text-decoration: none;
@@ -371,14 +371,14 @@ header h1 {
 }
 
 .references li:before {
-    content: "­ƒôÜ";
+    content: "📚";
     position: absolute;
     left: 0;
 }
 
 /* === 7. ANIMATIONER === */
 
-/* Fade-in animation f├Âr modal-bakgrund */
+/* Fade-in animation för modal-bakgrund */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -388,7 +388,7 @@ header h1 {
     }
 }
 
-/* Slide-down animation f├Âr modal-inneh├Ñll */
+/* Slide-down animation för modal-innehåll */
 @keyframes slideDown {
     from {
         transform: translateY(-50px);
@@ -401,7 +401,7 @@ header h1 {
 }
 
 /* === 8. VIDEO-SEKTION ===
-   UPPDATERING 2026-01-03: Ny sektion f├Âr inb├ñddad Twitter-video */
+   UPPDATERING 2026-01-03: Ny sektion för inbäddad Twitter-video */
 
 .video-section {
     margin: 40px 0;
@@ -420,7 +420,7 @@ header h1 {
     margin: 20px 0;
 }
 
-/* G├Âr Twitter-embed responsiv */
+/* Gör Twitter-embed responsiv */
 .video-container .twitter-tweet {
     margin: 0 auto !important;
 }
@@ -440,7 +440,7 @@ header h1 {
     text-decoration: underline;
 }
 
-/* === 9. INPUT-SEKTION F├ûR ATT L├äGGA TILL BILDER ===
+/* === 9. INPUT-SEKTION FÖR ATT LÄGGA TILL BILDER ===
    UPPDATERING 2026-01-03: Ny funktionalitet */
 
 .add-image-section {
@@ -472,14 +472,14 @@ header h1 {
     margin: 0 auto;
 }
 
-/* Input-f├ñlt med gul bakgrund enligt anv├ñndarens ├Ânskem├Ñl */
+/* Input-fält med gul bakgrund enligt användarens önskemål */
 #imageUrlInput {
     flex: 1;
     padding: 12px 15px;
     font-size: 1em;
     border: 2px solid #667eea;
     border-radius: 8px;
-    background-color: #fffde7; /* GUL BAKGRUND - tydligt inmatningsf├ñlt */
+    background-color: #fffde7; /* GUL BAKGRUND - tydligt inmatningsfält */
     transition: all 0.3s ease;
 }
 
@@ -534,7 +534,7 @@ header h1 {
 }
 
 /* === 10. BILDSTATUS-SEKTION ===
-   UPPDATERING 2026-01-03: Visar vilka bilder som visas och ├ñr i k├Â */
+   UPPDATERING 2026-01-03: Visar vilka bilder som visas och är i kö */
 
 .image-status-section {
     margin: 40px 0;
@@ -563,15 +563,15 @@ header h1 {
 }
 
 .status-box.current-images {
-    border-top-color: #28a745; /* Gr├Ân f├Âr aktiva bilder */
+    border-top-color: #28a745; /* Grön för aktiva bilder */
 }
 
 .status-box.stack-images {
-    border-top-color: #ffc107; /* Gul f├Âr v├ñntande bilder */
+    border-top-color: #ffc107; /* Gul för väntande bilder */
 }
 
 .status-box.user-images {
-    border-top-color: #764ba2; /* Lila f├Âr anv├ñndarbilder */
+    border-top-color: #764ba2; /* Lila för användarbilder */
 }
 
 .image-list {
@@ -645,7 +645,7 @@ header h1 {
     transform: scale(1.1);
 }
 
-/* === 11. LIGHTBOX F├ûR BILDVISNING ===
+/* === 11. LIGHTBOX FÖR BILDVISNING ===
    UPPDATERING 2026-01-03: Visar bilder i full storlek vid klick */
 
 .lightbox {
@@ -716,7 +716,7 @@ header h1 {
     align-items: center;
     gap: 8px;
     padding: 12px 25px;
-    background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%); /* Twitter-bl├Ñ */
+    background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%); /* Twitter-blå */
     color: white;
     text-decoration: none;
     border-radius: 50px;
@@ -754,7 +754,7 @@ header h1 {
 
 /* === 12. RESPONSIV DESIGN (MOBIL) === */
 
-/* F├Âr tablets och mindre sk├ñrmar */
+/* För tablets och mindre skärmar */
 @media (max-width: 768px) {
     /* Mindre padding i container */
     .container {
@@ -766,19 +766,19 @@ header h1 {
         font-size: 2em;
     }
     
-    /* 2x2 grid ist├ñllet f├Âr 3x3 p├Ñ mindre sk├ñrmar */
+    /* 2x2 grid istället för 3x3 på mindre skärmar */
     .image-grid {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
         gap: 10px;
     }
     
-    /* D├Âljer de sista 5 bilderna p├Ñ mobil (visar bara 4) */
+    /* Döljer de sista 5 bilderna på mobil (visar bara 4) */
     .image-grid .image-slot:nth-child(n+5) {
         display: none;
     }
     
-    /* Modal-inneh├Ñll anpassat f├Âr mobil */
+    /* Modal-innehåll anpassat för mobil */
     .modal-content {
         padding: 25px;
         margin: 10% auto;
@@ -793,15 +793,15 @@ header h1 {
         font-size: 1.3em;
     }
     
-    /* Mindre kodblock p├Ñ mobil */
+    /* Mindre kodblock på mobil */
     .modal-content pre {
         font-size: 0.8em;
         padding: 10px;
     }
     
-    /* UPPDATERING 2026-01-03: Responsiv design f├Âr nya sektioner */
+    /* UPPDATERING 2026-01-03: Responsiv design för nya sektioner */
     
-    /* Status-grid blir vertikal p├Ñ mobil */
+    /* Status-grid blir vertikal på mobil */
     .status-grid {
         grid-template-columns: 1fr;
         gap: 15px;
@@ -825,7 +825,7 @@ header h1 {
         font-size: 1.4em;
     }
     
-    /* UPPDATERING 2026-01-03: Lightbox p├Ñ mobil */
+    /* UPPDATERING 2026-01-03: Lightbox på mobil */
     .lightbox-close {
         top: 10px;
         right: 10px;
@@ -848,7 +848,7 @@ header h1 {
     }
 }
 
-/* F├Âr mycket sm├Ñ mobilsk├ñrmar */
+/* För mycket små mobilskärmar */
 @media (max-width: 480px) {
     header h1 {
         font-size: 1.6em;
@@ -868,7 +868,7 @@ header h1 {
         gap: 8px;
     }
     
-    /* UPPDATERING 2026-01-03: Anpassningar f├Âr sm├Ñ sk├ñrmar */
+    /* UPPDATERING 2026-01-03: Anpassningar för små skärmar */
     .status-box {
         padding: 15px;
     }
@@ -891,7 +891,7 @@ header h1 {
    UPPDATERING 2026-01-04: GitHub-info och versionsbadge
    ============================================ */
 
-/* Container f├Âr GitHub-information */
+/* Container för GitHub-information */
 .github-info-box {
     background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
     border: 1px solid #30363d;
@@ -978,7 +978,7 @@ header h1 {
     font-weight: normal;
 }
 
-/* Responsiv anpassning f├Âr GitHub-box */
+/* Responsiv anpassning för GitHub-box */
 @media (max-width: 600px) {
     .github-info-box {
         flex-direction: column;
@@ -1010,4 +1010,18 @@ header h1 {
     border-color: #a371f7 !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(137, 87, 229, 0.4);
+}
+
+/* UPPDATERING 2026-01-04 (v2.5): Wiki-knapp */
+.wiki-button {
+    background: linear-gradient(135deg, #0366d6 0%, #2188ff 100%) !important;
+    border-color: #0366d6 !important;
+    text-decoration: none;
+}
+
+.wiki-button:hover {
+    background: linear-gradient(135deg, #2188ff 0%, #58a6ff 100%) !important;
+    border-color: #2188ff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(3, 102, 214, 0.4);
 }
